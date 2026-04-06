@@ -7,10 +7,14 @@ import { createPortal } from 'react-dom';
 
 const RaiseTicket = () => {
   const [formData, setFormData] = useState({
-    title: '',
+    user_id: '',
+    date: '',
     type: '',
-    desc: '',
+    time: '',
+    reason: '',
   });
+  const [employees, setEmployees] = useState([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
 
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1);
@@ -84,25 +88,44 @@ const RaiseTicket = () => {
   };
 
   // FORMAT WORKED HOURS
-  const formatDuration = (timeString) => {
-    if (!timeString || timeString === '00:00:00') return '--';
+  // const formatDuration = (timeString) => {
+  //   if (!timeString || timeString === '00:00:00') return '--';
 
-    const [hours, minutes] = timeString.split(':').map(Number);
+  //   const [hours, minutes] = timeString.split(':').map(Number);
 
-    if (hours === 0 && minutes === 0) return '--';
+  //   if (hours === 0 && minutes === 0) return '--';
 
-    if (hours === 0) {
-      return `${minutes} min`;
+  //   if (hours === 0) {
+  //     return `${minutes} min`;
+  //   }
+
+  //   if (minutes === 0) {
+  //     return `${hours} hr`;
+  //   }
+
+  //   return `${hours} hr ${minutes} min`;
+  // };
+
+  /* ================= FETCH EMPLOYEES ================= */
+
+  const fetchEmployees = async () => {
+    try {
+      setLoadingEmployees(true);
+      const res = await fetch('https://hrms.mpdatahub.com/api/employee-List');
+      const json = await res.json();
+
+      if (json.success) {
+        setEmployees(json.data);
+      }
+    } catch (err) {
+      console.log(err);
     }
 
-    if (minutes === 0) {
-      return `${hours} hr`;
-    }
-
-    return `${hours} hr ${minutes} min`;
+    setLoading(false);
+    setLoadingEmployees(false);
   };
 
-  /* ================= FETCH NOTIFICATION ================= */
+  /* ================= FETCH RAISE TICKET ================= */
 
   useEffect(() => {
     const fetchRaiseTicket = async () => {
@@ -121,6 +144,7 @@ const RaiseTicket = () => {
       }
     };
     fetchRaiseTicket();
+    fetchEmployees();
   }, [activeForm, deleteId, dateFilter]);
 
   /* ================= HANDLE INPUT ================= */
@@ -143,7 +167,7 @@ const RaiseTicket = () => {
     }));
   };
 
-  /* ================= NOTIFICATION FORM SUBMIT ================= */
+  /* ================= RAISE TICKET FORM SUBMIT ================= */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -158,7 +182,7 @@ const RaiseTicket = () => {
 
     try {
       const response = await fetch(
-        'https://hrms.mpdatahub.com/api/notification/create',
+        'https://hrms.mpdatahub.com/api/ticket/create',
         {
           method: 'POST',
           body: submitData,
@@ -169,16 +193,18 @@ const RaiseTicket = () => {
 
       if (response.ok) {
         console.log(result);
-        alert(result.message || 'Notification Created successfully!');
+        alert(result.message || 'Ticket Created successfully!');
 
         setFormData({
-          title: '',
+          user_id: '',
+          date: '',
           type: '',
-          desc: '',
+          time: '',
+          reason: '',
         });
       } else {
         alert(
-          'Failed to create Notification: ' +
+          'Failed to create Ticket: ' +
             (result.message || 'Unknown error')
         );
       }
@@ -190,7 +216,7 @@ const RaiseTicket = () => {
     }
   };
 
-  /* ================= NOTIFICATION DELETE ================= */
+  /* ================= TICKET DELETE ================= */
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -200,23 +226,23 @@ const RaiseTicket = () => {
 
     try {
       const response = await fetch(
-        `https://hrms.mpdatahub.com/api/delete-Holiday/${deleteId}`
+        `https://hrms.mpdatahub.com/api/delete-Holida/${deleteId}`
       );
 
       const result = await response.json();
 
       if (response.ok) {
         console.log(result);
-        alert(result.message || 'Notification Deleted successfully!');
+        alert(result.message || 'Ticket Deleted successfully!');
       } else {
         alert(
-          'Failed to Delete Notification: ' +
+          'Failed to Delete Ticket: ' +
             (result.message || 'Unknown error')
         );
       }
     } catch (error) {
-      console.error('Error deleting notifcation:', error);
-      alert('Error deleting notification');
+      console.error('Error deleting Ticket:', error);
+      alert('Error deleting Ticket');
     } finally {
       setDeleteId(null);
     }
@@ -290,7 +316,6 @@ const RaiseTicket = () => {
               <span className="badge-value">{raiseTicket.length}</span>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -342,40 +367,81 @@ const RaiseTicket = () => {
               <h2 className="form-title">Raise Ticket</h2>
 
               <form onSubmit={handleSubmit} className="registration-form">
-                {/* TITLE */}
+                {/* EMP ID */}
 
                 <div className="form-group">
-                  <label>Title</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
+                  <label>Employee</label>
+
+                  <select
+                    name="user_id"
+                    value={formData.user_id}
                     onChange={handleChange}
                     required
-                  />
+                  >
+                    <option value="">
+                      {loadingEmployees ? 'Loading...' : 'Select Employee'}
+                    </option>
+
+                    {employees.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                {/* SCHEDULED DATE */}
+                {/* DATE */}
 
                 <div className="form-group">
                   <label>Date</label>
                   <input
                     type="date"
-                    name="type"
-                    value={formData.type}
+                    name="date"
+                    value={formData.date}
                     onChange={handleChange}
                     required
                   />
                 </div>
 
-                {/* DESCRIPTION */}
+                {/* CHECKIN/CHECKOUT */}
+
+                <div className="form-group">
+                  <label>Type</label>
+
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value=""></option>
+                    <option value="clock_in">CheckIn</option>
+                    <option value="clock_out">CheckOut</option>
+                  </select>
+                </div>
+
+
+                {/* TIME */}
+
+                <div className="form-group">
+                  <label>Time</label>
+                  <input
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {/* REASON */}
 
                 <div className="form-group full-width">
-                  <label>Description</label>
+                  <label>Reason</label>
 
                   <textarea
-                    name="desc"
-                    value={formData.desc}
+                    name="reason"
+                    value={formData.reason}
                     onChange={handleChange}
                     rows="3"
                     required
@@ -409,7 +475,7 @@ const RaiseTicket = () => {
                 <th>Check Out</th>
                 <th>Reason</th>
                 <th>Status</th>
-                <th>Worked Hours</th>
+                {/* <th>Worked Hours</th> */}
               </tr>
             </thead>
 
@@ -479,11 +545,11 @@ const RaiseTicket = () => {
                     </td>
 
                     {/* WORKED HOURS */}
-                    <td>
+                    {/* <td>
                       <span className="hours-text">
                         {formatDuration(record.time)}
                       </span>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (

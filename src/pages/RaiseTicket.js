@@ -204,8 +204,7 @@ const RaiseTicket = () => {
         });
       } else {
         alert(
-          'Failed to create Ticket: ' +
-            (result.message || 'Unknown error')
+          'Failed to create Ticket: ' + (result.message || 'Unknown error')
         );
       }
     } catch (error) {
@@ -236,8 +235,7 @@ const RaiseTicket = () => {
         alert(result.message || 'Ticket Deleted successfully!');
       } else {
         alert(
-          'Failed to Delete Ticket: ' +
-            (result.message || 'Unknown error')
+          'Failed to Delete Ticket: ' + (result.message || 'Unknown error')
         );
       }
     } catch (error) {
@@ -420,7 +418,6 @@ const RaiseTicket = () => {
                   </select>
                 </div>
 
-
                 {/* TIME */}
 
                 <div className="form-group">
@@ -522,12 +519,14 @@ const RaiseTicket = () => {
 
                     {/* STATUS */}
                     <td>
-                      <div className="status-flex">
+                      <div className="status-flexs">
                         <span
-                          className={`status-pill ${
-                            record.type?.toLowerCase() === 'present'
+                          className={`status-pills ${
+                            record.status?.toLowerCase() === 'approved'
                               ? 'present'
-                              : 'absent'
+                              : record.status?.toLowerCase() === 'rejected'
+                                ? 'absent'
+                                : 'pending'
                           }`}
                         >
                           {record.status || 'N/A'}
@@ -535,7 +534,7 @@ const RaiseTicket = () => {
 
                         {record.late_checkin === 1 && (
                           <span
-                            className="late-indicator"
+                            className="late-indicators"
                             title={`Late by ${record.late_checkin_time}`}
                           >
                             Late

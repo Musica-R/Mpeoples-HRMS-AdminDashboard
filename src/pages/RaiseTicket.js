@@ -324,7 +324,7 @@ const RaiseTicket = () => {
           className="toggle-btn"
           onClick={() => setActiveForm((prev) => !prev)}
         >
-          <IoAdd style={{ fontSize: '15px' }} /> Add Ticket
+          <IoAdd style={{ fontSize: '15px' }} /> Raise Ticket
         </button>
       </div>
 
@@ -453,7 +453,7 @@ const RaiseTicket = () => {
                 <div className="form-actions full-width">
                   <button type="submit" className="submit-btn">
                     {' '}
-                    Add Ticket{' '}
+                    Raise Ticket{' '}
                   </button>
                 </div>
               </form>

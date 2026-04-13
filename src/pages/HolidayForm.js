@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/HolidayForm.css';
 import Lottie from 'react-lottie';
-import animationData from '../LottieFiles/Completing Tasks.json';
+import animationData from '../LottieFiles/Confetti.json';
 import { IoAdd } from 'react-icons/io5';
 import { MdDeleteOutline } from 'react-icons/md';
 import { FaRegBell } from 'react-icons/fa';

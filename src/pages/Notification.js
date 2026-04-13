@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Notification.css';
 import Lottie from 'react-lottie';
-import animationData from '../LottieFiles/Completing Tasks.json';
+import animationData from '../LottieFiles/Notification Bell.json';
 import { IoAdd } from 'react-icons/io5';
 import { MdDeleteOutline } from 'react-icons/md';
 import { FaRegBell } from 'react-icons/fa';
 import { createPortal } from 'react-dom';
+// import { IoIosNotificationsOutline } from 'react-icons/io';
 
 const Notification = () => {
   const [formData, setFormData] = useState({
@@ -193,6 +194,7 @@ const Notification = () => {
         <div className="header-content">
           <div className="permission-title-group">
             <Lottie options={defaultOptions} height={70} width={70} />
+            {/* <IoIosNotificationsOutline className="ll-title-icon" /> */}
             <div>
               <h1>Notification Records</h1>
               <p>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CompanyDetails.css';
 import Lottie from 'react-lottie';
-import animationData from '../LottieFiles/Completing Tasks.json';
+import animationData from '../LottieFiles/Company.json';
 import { IoAdd } from 'react-icons/io5';
 // import { MdDeleteOutline } from 'react-icons/md';
 import { createPortal } from 'react-dom';

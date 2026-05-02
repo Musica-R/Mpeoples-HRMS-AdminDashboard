@@ -8,10 +8,11 @@ import {
   FiAlertCircle,
   FiSearch,
 } from 'react-icons/fi';
-import Lottie from 'react-lottie';
+import Lottie from "lottie-react";
 import animationData from '../LottieFiles/Allow Permission.json';
 
-// const PERMISSION_LIST_API = 'https://hrms.mpdatahub.com/api/premissionlist';
+// const PERMISSION_LIST_API = '${BASE_URL}/premissionlist';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const STATUS_CONFIG = {
   approved: {
@@ -27,14 +28,14 @@ const STATUS_CONFIG = {
   },
 };
 
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData: animationData,
-  rendererSettings: {
-    preserveAspectRatio: 'xMidYMid slice',
-  },
-};
+// const defaultOptions = {
+//   loop: true,
+//   autoplay: true,
+//   animationData: animationData,
+//   rendererSettings: {
+//     preserveAspectRatio: 'xMidYMid slice',
+//   },
+// };
 
 export default function PermissionList() {
   const [permissions, setPermissions] = useState([]);
@@ -83,7 +84,7 @@ export default function PermissionList() {
     try {
       setUpdatingId(id);
       const res = await fetch(
-        `https://hrms.mpdatahub.com/api/approve-permission/${id}`,
+        `${BASE_URL}/approve-permission/${id}`,
         {
           method: 'POST',
           headers: {
@@ -116,7 +117,7 @@ export default function PermissionList() {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          `https://hrms.mpdatahub.com/api/premissionlist?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
+          `${BASE_URL}/premissionlist?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
         );
         const json = await res.json();
 
@@ -155,10 +156,13 @@ export default function PermissionList() {
 
   const filtered = permissions.filter((p) => {
     const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
-    const matchesSearch =
-      String(p.id).includes(searchTerm) ||
-      p.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      String(p.user_id).includes(searchTerm);
+
+    // normalize search (remove extra spaces + lowercase)
+    const search = searchTerm.trim().replace(/\s+/g, ' ').toLowerCase();
+    const name = (p.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+    const matchesSearch = name.includes(search);
+
     return matchesStatus && matchesSearch;
   });
 
@@ -193,7 +197,8 @@ export default function PermissionList() {
     <div className="permission-page fade-in">
       <div className="permission-header">
         <div className="permission-title-group">
-          <Lottie options={defaultOptions} height={70} width={70} />
+          {/* <Lottie options={defaultOptions} height={70} width={70} /> */}
+          <Lottie animationData={animationData} style={{ width: "70px", height: "90px" }} />
           <div>
             <h1>Permission List</h1>
             <p>Total {counts.all} permission requests found</p>
@@ -242,6 +247,7 @@ export default function PermissionList() {
         </div>
         <div className="form-group">
           <label>Year Filter</label>
+
           <select name="year" value={dateFilter.year} onChange={handleDate}>
             {[2026, 2025, 2024, 2023].map((y) => (
               <option key={y} value={y}>
@@ -249,6 +255,8 @@ export default function PermissionList() {
               </option>
             ))}
           </select>
+          
+
         </div>
       </div>
 
@@ -314,6 +322,7 @@ export default function PermissionList() {
               <tr>
                 <th>S.No</th>
                 <th>Permission ID</th>
+                <th>Name</th>
                 <th>Date</th>
                 <th>Time Slot</th>
                 <th>Duration</th>
@@ -333,6 +342,11 @@ export default function PermissionList() {
                       <td>
                         <span className="pl-id-badge">#{p.id}</span>
                       </td>
+
+                      <td>
+                        <span className="pl-reason-text">{p.name}</span>
+                      </td>
+
                       <td>{formatDate(p.attendance_date)}</td>
                       <td>
                         <span className="pl-time-badge">

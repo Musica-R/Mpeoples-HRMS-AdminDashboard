@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Lottie from 'react-lottie';
+import Lottie from "lottie-react";
 import animationData from '../LottieFiles/App login.json';
 import womanImg from '../assets/women with tab 1.png';
 import '../styles/Login.css';
+
+ const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -12,24 +14,26 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const defaultOptions = {
-        loop: true,
-        autoplay: true,
-        animationData: animationData,
-        rendererSettings: { preserveAspectRatio: 'xMidYMid slice' }
-    };
+    // const defaultOptions = {
+    //     loop: true,
+    //     autoplay: true,
+    //     animationData: animationData,
+    //     rendererSettings: { preserveAspectRatio: 'xMidYMid slice' }
+    // };
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
         try {
-            const response = await fetch('https://hrms.mpdatahub.com/api/login', {
+            const response = await fetch(`${BASE_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
+
             const data = await response.json();
+
             if (response.ok && data.success) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
@@ -52,7 +56,8 @@ const Login = () => {
                 <div className="login-form-wrapper">
 
                     <div className="login-lottie">
-                        <Lottie options={defaultOptions} height={110} width={110} />
+                        {/* <Lottie options={defaultOptions} height={110} width={110} /> */}
+                          <Lottie animationData={animationData} style={{ width: "110px", height: "110px" }} />
                     </div>
 
                     <h1 className="login-title">LOGIN</h1>
@@ -61,33 +66,17 @@ const Login = () => {
                     {error && <div className="login-error">{error}</div>}
 
                     <form className="login-form" onSubmit={handleLogin}>
-                        <div className="form-group">
+                        <div className="form-groupss">
                             <div className="input-icon-wrapper">
                                 <span className="input-icon">
-                                    {/* <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                    </svg> */}
                                 </span>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Email Address"
-                                    required
-                                />
+                                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email Address" required/>
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className="form-groupss">
                             <div className="input-icon-wrapper">
                                 <span className="input-icon">
-                                    {/* <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                    </svg> */}
                                 </span>
                                 <input
                                     type="password"
@@ -104,32 +93,12 @@ const Login = () => {
                         </button>
                     </form>
 
-                    {/* ── Social Login ── */}
-                    {/* <div className="social-divider">
-                        <span className="divider-line" />
-                        <span className="divider-text"><strong>Login</strong> with Others</span>
-                        <span className="divider-line" />
-                    </div>
-
-                    <button className="social-btn google-btn" type="button">
-                        <svg width="20" height="20" viewBox="0 0 48 48">
-                            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.84l6.1-6.1C34.46 3.1 29.5 1 24 1 14.82 1 7.07 6.48 3.69 14.22l7.14 5.55C12.6 13.39 17.84 9.5 24 9.5z"/>
-                            <path fill="#4285F4" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.42c-.54 2.9-2.18 5.36-4.65 7.01l7.19 5.58C43.09 37.3 46.1 31.36 46.1 24.5z"/>
-                            <path fill="#FBBC05" d="M10.83 28.23A14.6 14.6 0 0 1 9.5 24c0-1.47.25-2.89.69-4.23L3.05 14.22A22.96 22.96 0 0 0 1 24c0 3.69.88 7.18 2.44 10.28l7.39-6.05z"/>
-                            <path fill="#34A853" d="M24 47c5.5 0 10.12-1.82 13.5-4.95l-7.19-5.58c-1.99 1.34-4.54 2.13-6.31 2.13-6.16 0-11.4-3.89-13.17-9.37l-7.39 6.05C7.07 41.52 14.82 47 24 47z"/>
-                        </svg>
-                        Login with <strong>google</strong>
-                    </button>
-
-                    <button className="social-btn facebook-btn" type="button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
-                            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
-                        </svg>
-                        Login with <strong>Facebook</strong>
-                    </button> */}
-
                 </div>
             </div>
+
+
+
+
 
             {/* ══════════════ RIGHT PANEL ══════════════ */}
             <div className="login-right">

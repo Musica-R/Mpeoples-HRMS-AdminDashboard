@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/RegistrationForm.css';
+import AdminHeader from './AdminHeader';
+
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +21,13 @@ const RegistrationForm = () => {
     end_time: '',
     dob: '',
     profileimg: null,
+
+    designation: '',
+    team_id: '',
+    employee_status: '',
+    qualification: '',
+    joining_date: '',
+    experience: '',
   });
 
   const [companies, setCompanies] = useState([]);
@@ -30,6 +40,9 @@ const RegistrationForm = () => {
 
   const [passwordError, setPasswordError] = useState('');
 
+  const [teams, setTeams] = useState([]);
+  const [loadingTeams, setLoadingTeams] = useState(false);
+
   /* ================= FETCH COMPANIES ================= */
 
   useEffect(() => {
@@ -38,7 +51,7 @@ const RegistrationForm = () => {
 
       try {
         const response = await fetch(
-          'https://hrms.mpdatahub.com/api/list-company'
+          `${BASE_URL}/list-company`
         );
         const result = await response.json();
         if (result.success) {
@@ -60,7 +73,7 @@ const RegistrationForm = () => {
       setLoadingRoles(true);
 
       try {
-        const response = await fetch('https://hrms.mpdatahub.com/api/roles');
+        const response = await fetch(`${BASE_URL}/roles`);
         const result = await response.json();
 
         if (result.success) {
@@ -85,7 +98,7 @@ const RegistrationForm = () => {
 
         try {
           const response = await fetch(
-            `https://hrms.mpdatahub.com/api/get-branch-for-company?company_id=${formData.company_id}`
+            `${BASE_URL}/get-branch-for-company?company_id=${formData.company_id}`
           );
 
           const result = await response.json();
@@ -109,6 +122,31 @@ const RegistrationForm = () => {
       setBranches([]);
     }
   }, [formData.company_id]);
+
+
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      setLoadingTeams(true);
+
+      try {
+        const response = await fetch(
+          `${BASE_URL}/teams/team-list`
+        );
+        const result = await response.json();
+
+        if (result.success) {
+          setTeams(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+
+      setLoadingTeams(false);
+    };
+
+    fetchTeams();
+  }, []);
 
   /* ================= HANDLE INPUT ================= */
 
@@ -150,7 +188,7 @@ const RegistrationForm = () => {
     });
 
     try {
-      const response = await fetch('https://hrms.mpdatahub.com/api/add-user', {
+      const response = await fetch(`${BASE_URL}/add-user`, {
         method: 'POST',
         body: submitData,
       });
@@ -177,9 +215,24 @@ const RegistrationForm = () => {
           end_time: '',
           dob: '',
           profileimg: null,
+
+          designation: '',
+          team_id: '',
+          employee_status: '',
+          qualification: '',
+          joining_date: '',
+          experience: '',
         });
       } else {
-        alert('Registration failed: ' + (result.message || 'Unknown error'));
+        if (result.errors) {
+          let errorMessages = Object.values(result.errors)
+            .flat()
+            .join('\n');
+
+          alert(errorMessages);
+        } else {
+          alert('Registration failed');
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -188,6 +241,8 @@ const RegistrationForm = () => {
   };
 
   return (
+    <>
+    <AdminHeader />
     <div className="form-container">
       <div className="form-card">
         <h2 className="form-title">Employee Registration</h2>
@@ -195,7 +250,7 @@ const RegistrationForm = () => {
         <form onSubmit={handleSubmit} className="registration-form">
           {/* NAME */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Full Name</label>
             <input
               type="text"
@@ -208,7 +263,7 @@ const RegistrationForm = () => {
 
           {/* EMPID */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Employee ID</label>
             <input
               type="text"
@@ -221,7 +276,7 @@ const RegistrationForm = () => {
 
           {/* EMAIL */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Email</label>
             <input
               type="email"
@@ -234,7 +289,7 @@ const RegistrationForm = () => {
 
           {/* MOBILE */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Mobile</label>
             <input
               type="text"
@@ -246,7 +301,7 @@ const RegistrationForm = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Date of Birth</label>
             <input
               type="date"
@@ -259,7 +314,7 @@ const RegistrationForm = () => {
 
           {/* PASSWORD */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Password</label>
             <input
               type="password"
@@ -272,7 +327,7 @@ const RegistrationForm = () => {
 
           {/* CONFIRM PASSWORD */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Confirm Password</label>
             <input
               type="password"
@@ -289,7 +344,7 @@ const RegistrationForm = () => {
 
           {/* POSITION */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Position</label>
             <input
               type="text"
@@ -302,7 +357,7 @@ const RegistrationForm = () => {
 
           {/* ROLE */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Role</label>
 
             <select
@@ -325,7 +380,7 @@ const RegistrationForm = () => {
 
           {/* COMPANY */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Company</label>
 
             <select
@@ -348,7 +403,7 @@ const RegistrationForm = () => {
 
           {/* BRANCH */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Branch</label>
 
             <select
@@ -370,9 +425,92 @@ const RegistrationForm = () => {
             </select>
           </div>
 
+
+          <div className="form-groups">
+            <label>Designation</label>
+
+            <select
+              name="designation"
+              value={formData.designation}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Designation</option>
+              <option value="TL">Team Lead</option>
+              <option value="TM">Team Member</option>
+            </select>
+          </div>
+
+          <div className="form-groups">
+            <label>Team</label>
+
+            <select
+              name="team_id"
+              value={formData.team_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">
+                {loadingTeams ? 'Loading...' : 'Select Team'}
+              </option>
+
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-groups">
+            <label>Employee Status</label>
+
+            <select
+              name="employee_status"
+              value={formData.employee_status}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Status</option>
+              <option value="working">Working</option>
+              <option value="notice_period">Notice Period</option>
+              <option value="relieved">Relieved</option>
+            </select>
+          </div>
+
+          <div className="form-groups">
+            <label>Qualification</label>
+            <input
+              type="text"
+              name="qualification"
+              value={formData.qualification}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-groups">
+            <label>Joining Date</label>
+            <input
+              type="date"
+              name="joining_date"
+              value={formData.joining_date}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-groups">
+            <label>Experience</label>
+            <input
+              type="text"
+              name="experience"
+              value={formData.experience}
+              onChange={handleChange}
+            />
+          </div>
+
           {/* START TIME */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>Start Time</label>
             <input
               type="time"
@@ -386,7 +524,7 @@ const RegistrationForm = () => {
 
           {/* END TIME */}
 
-          <div className="form-group">
+          <div className="form-groups">
             <label>End Time</label>
             <input
               type="time"
@@ -401,7 +539,7 @@ const RegistrationForm = () => {
 
           {/* ADDRESS */}
 
-          <div className="form-group full-width">
+          <div className="form-groups full-width">
             <label>Address</label>
 
             <textarea
@@ -415,7 +553,7 @@ const RegistrationForm = () => {
 
           {/* PROFILE IMAGE */}
 
-          <div className="form-group full-width">
+          <div className="form-groups full-width">
             <label>Profile Image</label>
 
             <input
@@ -437,6 +575,7 @@ const RegistrationForm = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

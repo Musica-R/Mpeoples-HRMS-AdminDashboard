@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CompanyDetails.css';
-import Lottie from 'react-lottie';
+import Lottie from "lottie-react";
 import animationData from '../LottieFiles/Company.json';
 import { IoAdd } from 'react-icons/io5';
 // import { MdDeleteOutline } from 'react-icons/md';
@@ -8,7 +8,11 @@ import { createPortal } from 'react-dom';
 import { FaGreaterThan } from 'react-icons/fa6';
 import { CiEdit } from 'react-icons/ci';
 
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const CompanyDetails = () => {
+
+
   const [formData, setFormData] = useState({
     company_name: '',
     company_address: '',
@@ -38,14 +42,14 @@ const CompanyDetails = () => {
 
   const [loading, setLoading] = useState(true);
 
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  };
+  // const defaultOptions = {
+  //   loop: true,
+  //   autoplay: true,
+  //   animationData: animationData,
+  //   rendererSettings: {
+  //     preserveAspectRatio: 'xMidYMid slice',
+  //   },
+  // };
 
   /* ================= EDIT BRANCH ================= */
 
@@ -71,7 +75,7 @@ const CompanyDetails = () => {
 
       try {
         const response = await fetch(
-          'https://hrms.mpdatahub.com/api/list-company'
+          `${BASE_URL}/list-company`
         );
         const result = await response.json();
         if (result.success) {
@@ -94,7 +98,7 @@ const CompanyDetails = () => {
     const fetchBranch = async () => {
       try {
         const response = await fetch(
-          `https://hrms.mpdatahub.com/api/list-Branch-id/${companyId}`
+          `${BASE_URL}/list-Branch-id/${companyId}`
         );
         const result = await response.json();
         if (result.success) {
@@ -143,7 +147,7 @@ const CompanyDetails = () => {
 
     try {
       const response = await fetch(
-        'https://hrms.mpdatahub.com/api/add-company',
+        `${BASE_URL}/add-company`,
         {
           method: 'POST',
           body: submitData,
@@ -189,7 +193,7 @@ const CompanyDetails = () => {
     try {
       if (isEdit) {
         const response = await fetch(
-          'https://hrms.mpdatahub.com/api/update-branch',
+          `${BASE_URL}/update-branch`,
           {
             method: 'POST',
             body: submitData,
@@ -217,7 +221,7 @@ const CompanyDetails = () => {
         }
       } else {
         const response = await fetch(
-          'https://hrms.mpdatahub.com/api/add-branch',
+          `${BASE_URL}/add-branch`,
           {
             method: 'POST',
             body: submitData,
@@ -269,7 +273,8 @@ const CompanyDetails = () => {
       <div className="page-headers glass-panels">
         <div className="header-content">
           <div className="permission-title-group">
-            <Lottie options={defaultOptions} height={70} width={70} />
+            {/* <Lottie options={defaultOptions} height={70} width={70} /> */}
+                      <Lottie animationData={animationData} style={{ width: "70px", height: "70px" }} />
             <div>
               <h1>Add Company</h1>
               <p>
@@ -281,12 +286,13 @@ const CompanyDetails = () => {
         </div>
       </div>
       <div className="toggle-button">
-        <button
+        
+        {/* <button
           className="toggle-btn"
           onClick={() => setActiveCompanyForm((prev) => !prev)}
         >
           <IoAdd style={{ fontSize: '15px' }} /> Add Company
-        </button>
+        </button> */}
 
         <button
           className="toggle-btn"
@@ -352,6 +358,7 @@ const CompanyDetails = () => {
                     Add Company{' '}
                   </button>
                 </div>
+
               </form>
             </div>
           </div>,

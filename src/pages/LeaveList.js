@@ -10,8 +10,10 @@ import {
   FiSearch,
 } from 'react-icons/fi';
 
-// const LEAVE_LIST_API = `https://hrms.mpdatahub.com/api/leave-list`;
-const UPDATE_STATUS_API = 'https://hrms.mpdatahub.com/api/update-Leave-status';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+// const LEAVE_LIST_API = `${BASE_URL}/leave-list`;
+const UPDATE_STATUS_API = `${BASE_URL}/update-Leave-status`;
 
 const STATUS_CONFIG = {
   approved: {
@@ -83,7 +85,7 @@ export default function LeaveList() {
         setError(null);
 
         const res = await fetch(
-          `https://hrms.mpdatahub.com/api/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
+          `${BASE_URL}/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
         );
         const json = await res.json();
 
@@ -111,7 +113,7 @@ export default function LeaveList() {
   //     setError(null);
 
   //     const res = await fetch(
-  //       `https://hrms.mpdatahub.com/api/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
+  //       `${BASE_URL}/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
   //     );
   //     const json = await res.json();
 
@@ -168,12 +170,11 @@ export default function LeaveList() {
   const filtered = leaves.filter((l) => {
     const matchStatus = filterStatus === 'all' || l.status === filterStatus;
 
-    const matchSearch =
-      String(l.id).includes(searchTerm) ||
-      (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (l.empid || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (l.reason || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (l.leave_date || '').includes(searchTerm);
+    // normalize search (remove extra spaces + lowercase)
+    const search = searchTerm.trim().replace(/\s+/g, ' ').toLowerCase();
+    const name = (l.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+    const matchSearch = name.includes(search);
 
     return matchStatus && matchSearch;
   });
@@ -266,13 +267,15 @@ export default function LeaveList() {
         </div>
         <div className="form-group">
           <label>Year Filter</label>
+
           <select name="year" value={dateFilter.year} onChange={handleDate}>
-            {[2026, 2025, 2024, 2023].map((y) => (
+            {Array.from({ length: 10 }, (_, i) => currentYear - 5 + i).map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>
             ))}
           </select>
+          
         </div>
       </div>
 

@@ -112,6 +112,12 @@ body {
 
 .highlight-text {
   color: var(--primary);
+  text-transform: lowercase;
+  display: inline-block;
+}
+
+.highlight-text::first-letter {
+  text-transform: uppercase;
 }
 
 .page-subtitle {

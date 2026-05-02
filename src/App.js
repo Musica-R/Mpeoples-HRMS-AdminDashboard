@@ -19,6 +19,8 @@ import Notification from './pages/Notification';
 import CompanyDetails from './pages/CompanyDetails';
 import RaiseTicket from './pages/RaiseTicket';
 import ProtectedRoute from './pages/ProtectedRoute';
+import TeamManagement from './pages/TeamManagement';
+import Montlyreport from './pages/Montlyreport';
 
 
 
@@ -48,9 +50,9 @@ function App() {
               </ProtectedRoute>
             }
           >
-
             <Route index element={<DashboardHome />} />
             <Route path="add-employee" element={<RegistrationForm />} />
+            <Route path="add-team" element={<TeamManagement />} />
             <Route path="emp-list" element={<EmpList />} />
             <Route path="leave-list" element={<LeaveList />} />
             <Route path="permission-list" element={<PermissionList />} />
@@ -59,6 +61,7 @@ function App() {
             <Route path="add-notification" element={<Notification />} />
             <Route path="add-company" element={<CompanyDetails />} />
             <Route path="raise-ticket" element={<RaiseTicket />} />
+            <Route path="monthly-report" element={<Montlyreport />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

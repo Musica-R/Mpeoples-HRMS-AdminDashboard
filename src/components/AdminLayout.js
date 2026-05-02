@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet} from 'react-router-dom';
-import { FiHome, FiUserPlus, FiLogOut, FiCalendar, FiUsers, FiMenu, FiX, FiFileText, FiShield } from 'react-icons/fi';
+import { FiHome, FiLogOut, FiCalendar, FiUsers, FiMenu, FiX, FiFileText, FiShield } from 'react-icons/fi';
 import '../styles/AdminLayout.css';
 import { BsSuitcase2 } from 'react-icons/bs';
 import { MdOutlineNotificationsActive } from 'react-icons/md';
 import { GoOrganization } from 'react-icons/go';
 import { IoTicketOutline } from 'react-icons/io5';
+// import { HiUserGroup } from "react-icons/hi2";
 
 const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,13 +51,21 @@ const AdminLayout = () => {
                         <FiHome className="nav-icon" /><span>Dashboard</span>
                     </NavLink>
 
-                    <NavLink
+                    {/* <NavLink
                         to="/admin/add-employee"
                         className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
                         onClick={closeSidebar}
                     >
                         <FiUserPlus className="nav-icon" /> <span>Add Employee</span>
                     </NavLink>
+                    
+                     <NavLink
+                        to="/admin/add-team"
+                        className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+                        onClick={closeSidebar}
+                    >
+                        <HiUserGroup className="nav-icon" /> <span>Add Team</span>
+                    </NavLink> */}
 
                     <NavLink
                         to="/admin/emp-list"

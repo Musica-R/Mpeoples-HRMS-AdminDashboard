@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../styles/DashboardHome.css';
 import { useNavigate } from 'react-router-dom';
 
+ const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const DashboardHome = () => {
 
     const navigate = useNavigate();
@@ -18,7 +20,7 @@ const DashboardHome = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await fetch('https://hrms.mpdatahub.com/api/dashboard-list');
+                const response = await fetch(`${BASE_URL}/dashboard-list`);
                 const result = await response.json();
                 if (result.success) {
                     setDashboardData(result.data);
@@ -86,7 +88,7 @@ const DashboardHome = () => {
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
-        return `https://hrms.mpdatahub.com/images/${imagePath}`;
+        return `https://mps.mpdatahub.com/images/${imagePath}`;
     };
 
     if (loading) {

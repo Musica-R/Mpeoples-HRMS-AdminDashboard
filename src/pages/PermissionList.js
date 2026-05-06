@@ -48,12 +48,16 @@ export default function PermissionList() {
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1);
   const currentYear = now.getFullYear();
+  // const currentYear = new Date().getFullYear();
 
   const [dateFilter, setDateFilter] = useState({
     user_id: '',
     month: currentMonth,
     year: currentYear,
   });
+
+
+
 
   const monthOptions = [
     { label: 'January', value: '1' },
@@ -173,25 +177,25 @@ export default function PermissionList() {
     rejected: permissions.filter((p) => p.status === 'rejected').length,
   };
 
-  const formatDuration = (value) => {
-    if (!value) return '—';
+  // const formatDuration = (value) => {
+  //   if (!value) return '—';
 
-    const num = parseFloat(value);
+  //   const num = parseFloat(value);
 
-    // If less than 1 hour → convert to minutes
-    if (num < 1) {
-      return `${Math.round(num * 100)} min`;
-    }
+  //   // If less than 1 hour → convert to minutes
+  //   if (num < 1) {
+  //     return `${Math.round(num * 100)} min`;
+  //   }
 
-    const hours = Math.floor(num);
-    const minutes = Math.round((num - hours) * 100);
+  //   const hours = Math.floor(num);
+  //   const minutes = Math.round((num - hours) * 100);
 
-    if (minutes === 0) {
-      return `${hours} hr`;
-    }
+  //   if (minutes === 0) {
+  //     return `${hours} hr`;
+  //   }
 
-    return `${hours} hr ${minutes} min`;
-  };
+  //   return `${hours} hr ${minutes} min`;
+  // };
 
   return (
     <div className="permission-page fade-in">
@@ -248,14 +252,15 @@ export default function PermissionList() {
         <div className="form-group">
           <label>Year Filter</label>
 
+
           <select name="year" value={dateFilter.year} onChange={handleDate}>
-            {[2026, 2025, 2024, 2023].map((y) => (
+            {Array.from({ length: 11 }, (_, i) => currentYear - 5 + i).map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>
             ))}
           </select>
-          
+
 
         </div>
       </div>
@@ -355,7 +360,7 @@ export default function PermissionList() {
                       </td>
                       <td>
                         <span className="pl-hours">
-                          {formatDuration(p.permission_hours)}
+                         {p.permission_hours}
                         </span>
                       </td>
                       <td className="pl-reason-cell">

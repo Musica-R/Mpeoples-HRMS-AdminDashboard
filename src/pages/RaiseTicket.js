@@ -321,16 +321,20 @@ const RaiseTicket = () => {
         </div>
         <div className="rt-filter-group">
           <label className="rt-filter-label">Year</label>
+
           <select
             className="rt-filter-select"
             name="year"
             value={dateFilter.year}
             onChange={handleDate}
           >
-            {[2026, 2025, 2024, 2023].map((y) => (
-              <option key={y} value={y}>{y}</option>
+            {Array.from({ length: 11 }, (_, i) => currentYear - 5 + i).map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
             ))}
           </select>
+
         </div>
       </div>
 
@@ -487,13 +491,12 @@ const RaiseTicket = () => {
                         <td>
                           <div className="rt-status-cell">
                             <span
-                              className={`rt-status-pill ${
-                                record.status?.toLowerCase() === 'approved'
+                              className={`rt-status-pill ${record.status?.toLowerCase() === 'approved'
                                   ? 'rt-status-approved'
                                   : record.status?.toLowerCase() === 'rejected'
-                                  ? 'rt-status-rejected'
-                                  : 'rt-status-pending'
-                              }`}
+                                    ? 'rt-status-rejected'
+                                    : 'rt-status-pending'
+                                }`}
                             >
                               {sc.icon}&nbsp;{sc.label}
                             </span>

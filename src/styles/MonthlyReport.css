@@ -185,7 +185,7 @@
 }
 
 .summary-card {
-    min-width: 160px;          /* UPDATE from 130px */
+    min-width: 80px;          /* UPDATE from 130px */
     padding: 16px 20px;        /* slightly bigger */
 }
 

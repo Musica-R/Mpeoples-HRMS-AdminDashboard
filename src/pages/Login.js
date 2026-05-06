@@ -5,7 +5,7 @@ import animationData from '../LottieFiles/App login.json';
 import womanImg from '../assets/women with tab 1.png';
 import '../styles/Login.css';
 
- const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -37,7 +37,12 @@ const Login = () => {
             if (response.ok && data.success) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
-                navigate('/admin');
+                if (data.user.role_id === 1) {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                    alert("Access denied: Only admin can login. Please use admin credentials.")
+                }
             } else {
                 setError(data.message || "Login failed");
             }
@@ -57,7 +62,7 @@ const Login = () => {
 
                     <div className="login-lottie">
                         {/* <Lottie options={defaultOptions} height={110} width={110} /> */}
-                          <Lottie animationData={animationData} style={{ width: "110px", height: "110px" }} />
+                        <Lottie animationData={animationData} style={{ width: "110px", height: "110px" }} />
                     </div>
 
                     <h1 className="login-title">LOGIN</h1>
@@ -70,7 +75,7 @@ const Login = () => {
                             <div className="input-icon-wrapper">
                                 <span className="input-icon">
                                 </span>
-                                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email Address" required/>
+                                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email Address" required />
                             </div>
                         </div>
 
@@ -106,7 +111,7 @@ const Login = () => {
                 {/* Wavy SVG background */}
                 <svg className="right-wavy-bg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
                     <ellipse cx="620" cy="120" rx="320" ry="220" fill="rgba(255,255,255,0.07)" />
-                    <ellipse cx="80"  cy="600" rx="280" ry="200" fill="rgba(255,255,255,0.06)" />
+                    <ellipse cx="80" cy="600" rx="280" ry="200" fill="rgba(255,255,255,0.06)" />
                     <ellipse cx="350" cy="350" rx="500" ry="180" fill="rgba(255,255,255,0.04)" />
                 </svg>
 
@@ -135,7 +140,7 @@ const Login = () => {
                         <svg width="22" height="22" viewBox="0 0 24 24"
                             fill="#f6c90e" stroke="#f6c90e" strokeWidth="1"
                             strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                         </svg>
                     </div>
 

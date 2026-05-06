@@ -275,7 +275,7 @@ export default function LeaveList() {
               </option>
             ))}
           </select>
-          
+
         </div>
       </div>
 
@@ -359,6 +359,7 @@ export default function LeaveList() {
                     <th>Leave ID</th>
                     <th>Employee Details</th>
                     <th>Leave Date</th>
+                    <th>Leave Type</th>
                     <th>Reason</th>
                     <th>Applied On</th>
                     <th>Leave Duration</th>
@@ -392,6 +393,11 @@ export default function LeaveList() {
                         <td className="ll-date">
                           {formatDate(leave.leave_date)}
                         </td>
+
+                        <td className="ll-type">
+                          {leave.leave_type || '—'}
+                        </td>
+
 
                         <td className="ll-reason-cell">
                           <div className="ll-reason-text" title={leave.reason}>

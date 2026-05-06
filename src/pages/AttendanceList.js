@@ -407,7 +407,7 @@ const AttendanceList = () => {
         <div className="header-content">
           <div className="permission-title-group">
             {/* <Lottie options={defaultOptions} height={70} width={70} /> */}
-              <Lottie animationData={animationData} style={{ width: "70px", height: "70px" }} />
+            <Lottie animationData={animationData} style={{ width: "70px", height: "70px" }} />
             <div>
               <h1>Attendance Records</h1>
               <p>Track and manage employee daily presence and work hours.</p>
@@ -581,10 +581,12 @@ const AttendanceList = () => {
                       <div className="status-flex">
                         <span
                           className={`status-pill ${record.type === 'PRESENT'
-                            ? 'present'
-                            : record.type === 'ABSENT'
-                              ? 'absent'
-                              : 'holiday'
+                              ? 'present'
+                              : record.type === 'ABSENT'
+                                ? 'absent'
+                                : record.type === 'ONDUTY'
+                                  ? 'onduty'
+                                  : 'holiday'
                             }`}
                         >
                           {{
@@ -592,7 +594,8 @@ const AttendanceList = () => {
                             'C-H': 'Casual Holiday',
                             'W-H': 'Weekend Holiday',
                             'PRESENT': 'Present',
-                            'ABSENT': 'Absent'
+                            'ABSENT': 'Absent',
+                            'ONDUTY': 'On Duty'
                           }[record.type] || '—'}
                         </span>
 

@@ -65,11 +65,24 @@ export default function MonthlyReport() {
                     total_holidays: data.data.total_holidays,
                     working_days: data.data.working_days,
                     present_days: data.data.present_days,
+
+                    absent_days: data.data.absent_days,
+                    leave_days: data.data.leave_days,
+                    total_late_time: data.data.total_late_time,
                 });
             }
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const formatTotalLateTime = (timeStr) => {
+        if (!timeStr || timeStr === "00:00") return "-";
+
+        const [hh, mm] = timeStr.split(":");
+        const minutes = parseInt(hh) * 60 + parseInt(mm);
+
+        return `${minutes} min`;
     };
 
     // ✅ FORMAT TIME
@@ -96,8 +109,21 @@ export default function MonthlyReport() {
 
     // ✅ FORMAT LATE CHECK-IN (already HH:MM, just display as-is or dash)
     const formatLateTime = (timeStr) => {
+        if (!timeStr || timeStr === "00:00" || timeStr === "--:--") return "-";
+
+        const [hh, mm] = timeStr.split(":");
+        const minutes = parseInt(hh) * 60 + parseInt(mm);
+
+        return `${minutes} min`;
+    };
+
+    const formatBreakTime = (timeStr) => {
         if (!timeStr || timeStr === "00:00") return "-";
-        return timeStr;
+
+        const [hh, mm] = timeStr.split(":");
+        const minutes = parseInt(hh) * 60 + parseInt(mm);
+
+        return `${minutes} min`;
     };
 
     // ✅ EXPORT EXCEL
@@ -116,6 +142,9 @@ export default function MonthlyReport() {
                 ["Total Holidays", summary.total_holidays],
                 ["Working Days", summary.working_days],
                 ["Present Days", summary.present_days],
+                ["Absent Days", summary.absent_days],
+                ["Leave Days", summary.leave_days],
+                ["Total Late Time", formatTotalLateTime(summary.total_late_time)],
                 [],
             ]
             : [
@@ -130,6 +159,7 @@ export default function MonthlyReport() {
             "Check In",
             "Check Out",
             "Break In",
+            "Total Break",
             "Break Out",
             "Late Check-In Time",
             "Status",
@@ -142,6 +172,7 @@ export default function MonthlyReport() {
             formatTime(r.check_out),
             formatTime(r.break_in),
             formatTime(r.break_out),
+            formatBreakTime(r.total_break_minutes),
             formatLateTime(r.late_checkin_time),
             getStatusLabel(r.type)
         ]);
@@ -206,12 +237,23 @@ export default function MonthlyReport() {
         if (summary) {
             autoTable(doc, {
                 startY: 32,
-                head: [["Total Days", "Total Holidays", "Working Days", "Present Days"]],
+                head: [[
+                    "Total Days",
+                    "Holidays",
+                    "Working Days",
+                    "Present",
+                    "Absent",
+                    "Leave",
+                    "Late Time"
+                ]],
                 body: [[
                     summary.total_days,
                     summary.total_holidays,
                     summary.working_days,
                     summary.present_days,
+                    summary.absent_days,
+                    summary.leave_days,
+                    formatTotalLateTime(summary.total_late_time),
                 ]],
                 theme: "grid",
                 headStyles: { fillColor: [0, 123, 255] },
@@ -227,6 +269,7 @@ export default function MonthlyReport() {
             formatTime(r.check_out),
             formatTime(r.break_in),
             formatTime(r.break_out),
+            formatBreakTime(r.total_break_minutes),
             formatLateTime(r.late_checkin_time),
             getStatusLabel(r.type)
         ]);
@@ -240,6 +283,7 @@ export default function MonthlyReport() {
                 "Check Out",
                 "Break In",
                 "Break Out",
+                "Total Break",
                 "Late Check-In",
                 "Status",
             ]],
@@ -259,6 +303,7 @@ export default function MonthlyReport() {
             "W-H": "Weekend Holiday",
             "PRESENT": "Present",
             "ABSENT": "Absent",
+            "ONDUTY": "On Duty",
         }[type] || "—";
     };
 
@@ -330,6 +375,23 @@ export default function MonthlyReport() {
                         <span className="summary-label">Present Days</span>
                         <span className="summary-value">{summary.present_days}</span>
                     </div>
+
+                    <div className="summary-card absent">
+                        <span className="summary-label">Absent Days</span>
+                        <span className="summary-value">{summary.absent_days}</span>
+                    </div>
+
+                    <div className="summary-card leave">
+                        <span className="summary-label">Leave Days</span>
+                        <span className="summary-value">{summary.leave_days}</span>
+                    </div>
+
+                    <div className="summary-card late">
+                        <span className="summary-label">Total Late</span>
+                        <span className="summary-value" style={{ fontFamily: "math" }}>
+                            {formatTotalLateTime(summary.total_late_time)}
+                        </span>
+                    </div>
                 </div>
             )}
 
@@ -347,6 +409,7 @@ export default function MonthlyReport() {
                                 <th>Check Out</th>
                                 <th>Break In</th>
                                 <th>Break Out</th>
+                                <th>Total Break</th>
                                 <th>Late Check-In</th>
                                 <th>Status</th>
                             </tr>
@@ -360,6 +423,7 @@ export default function MonthlyReport() {
                                     <td>{formatTime(r.check_out)}</td>
                                     <td>{formatTime(r.break_in)}</td>
                                     <td>{formatTime(r.break_out)}</td>
+                                    <td>{formatBreakTime(r.total_break_minutes)}</td>
                                     <td className={r.late_checkin ? "late-text" : ""}>
                                         {formatLateTime(r.late_checkin_time)}
                                     </td>
@@ -369,7 +433,9 @@ export default function MonthlyReport() {
                                                 ? "present"
                                                 : r.type === "ABSENT"
                                                     ? "absent"
-                                                    : "holiday"
+                                                    : r.type === "ONDUTY"
+                                                        ? "onduty"
+                                                        : "holiday"
                                                 }`}
                                         >
                                             {{
@@ -378,6 +444,7 @@ export default function MonthlyReport() {
                                                 "W-H": "Weekend Holiday",
                                                 "PRESENT": "Present",
                                                 "ABSENT": "Absent",
+                                                "ONDUTY": "On Duty",
                                             }[r.type] || "—"}
                                         </span>
                                     </td>

@@ -586,17 +586,28 @@ const AttendanceList = () => {
                                 ? 'absent'
                                 : record.type === 'ONDUTY'
                                   ? 'onduty'
-                                  : 'holiday'
+                                  : ['LOP', 'SICK', 'CASUAL', 'LEAVE'].includes(record.type)
+                                    ? 'leave'
+                                    : ['L-H', 'C-H', 'W-H'].includes(record.type)
+                                      ? 'holiday'
+                                      : record.type === 'HALFDAY'
+                                        ? 'halfday'
+                                        : ''
                             }`}
                         >
                           {{
+                            'PRESENT': 'Present',
+                            'ABSENT': 'Absent',
+                            'HALFDAY': 'Half Day',
+                            'LEAVE': 'Leave',
                             'L-H': 'Local Holiday',
                             'C-H': 'Casual Holiday',
                             'W-H': 'Weekend Holiday',
-                            'PRESENT': 'Present',
-                            'ABSENT': 'Absent',
+                            'SICK': 'Sick Leave',
+                            'CASUAL': 'Casual Leave',
+                            'LOP': 'Loss of Pay',
                             'ONDUTY': 'On Duty'
-                          }[record.type] || '—'}
+                          }[record.type] || record.type}
                         </span>
 
                         {record.late_checkin === 1 && (

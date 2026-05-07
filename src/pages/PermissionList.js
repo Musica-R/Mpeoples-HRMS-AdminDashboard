@@ -177,6 +177,19 @@ export default function PermissionList() {
     rejected: permissions.filter((p) => p.status === 'rejected').length,
   };
 
+
+  const formatMinutes = (minutes) => {
+  const totalMinutes = Math.round(parseFloat(minutes));
+
+  const hrs = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  if (hrs === 0) return `${mins} min`;
+  if (mins === 0) return `${hrs} hr`;
+
+  return `${hrs} hr ${mins} min`;
+};
+
   // const formatDuration = (value) => {
   //   if (!value) return '—';
 
@@ -360,7 +373,7 @@ export default function PermissionList() {
                       </td>
                       <td>
                         <span className="pl-hours">
-                         {p.permission_hours}
+                         {formatMinutes(p.permission_hours)}
                         </span>
                       </td>
                       <td className="pl-reason-cell">

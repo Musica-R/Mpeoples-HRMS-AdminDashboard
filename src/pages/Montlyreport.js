@@ -159,8 +159,8 @@ export default function MonthlyReport() {
             "Check In",
             "Check Out",
             "Break In",
-            "Total Break",
             "Break Out",
+            "Total Break",
             "Late Check-In Time",
             "Status",
         ];
@@ -298,15 +298,20 @@ export default function MonthlyReport() {
 
     const getStatusLabel = (type) => {
         return {
+            "PRESENT": "Present",
+            "ABSENT": "Absent",
+            "HALFDAY": "Half Day",
+            "LEAVE": "Leave",
+            "SICK": "Sick Leave",
+            "CASUAL": "Casual Leave",
+            "LOP": "Loss of Pay",
+            "ONDUTY": "On Duty",
+
             "L-H": "Local Holiday",
             "C-H": "Casual Holiday",
             "W-H": "Weekend Holiday",
-            "PRESENT": "Present",
-            "ABSENT": "Absent",
-            "ONDUTY": "On Duty",
-        }[type] || "—";
+        }[type] || type;   // ✅ fallback to original value
     };
-
     return (
         <div className="monthly-container">
             <button className="back-btn" onClick={() => navigate(-1)}>
@@ -429,23 +434,16 @@ export default function MonthlyReport() {
                                     </td>
                                     <td>
                                         <span
-                                            className={`status-pill ${r.type === "PRESENT"
-                                                ? "present"
-                                                : r.type === "ABSENT"
-                                                    ? "absent"
-                                                    : r.type === "ONDUTY"
-                                                        ? "onduty"
-                                                        : "holiday"
+                                            className={`status-pill ${r.type === "PRESENT" ? "present" :
+                                                r.type === "ABSENT" ? "absent" :
+                                                    r.type === "HALFDAY" ? "halfday" :
+                                                        r.type === "LEAVE" || r.type === "SICK" || r.type === "CASUAL" ? "leave" :
+                                                            r.type === "LOP" ? "lop" :
+                                                                r.type === "ONDUTY" ? "onduty" :
+                                                                    "holiday"
                                                 }`}
                                         >
-                                            {{
-                                                "L-H": "Local Holiday",
-                                                "C-H": "Casual Holiday",
-                                                "W-H": "Weekend Holiday",
-                                                "PRESENT": "Present",
-                                                "ABSENT": "Absent",
-                                                "ONDUTY": "On Duty",
-                                            }[r.type] || "—"}
+                                            {getStatusLabel(r.type)}
                                         </span>
                                     </td>
                                 </tr>

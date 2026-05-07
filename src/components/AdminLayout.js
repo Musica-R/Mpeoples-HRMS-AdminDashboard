@@ -7,8 +7,10 @@ import { MdOutlineNotificationsActive } from 'react-icons/md';
 import { GoOrganization } from 'react-icons/go';
 import { IoTicketOutline } from 'react-icons/io5';
 import { MdOutlineFolderCopy } from "react-icons/md";
+import { MdOutlineAddTask } from "react-icons/md";
 
 const AdminLayout = () => {
+    
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleLogout = () => {
@@ -23,6 +25,7 @@ const AdminLayout = () => {
         <div className="admin-layout">
 
             {/* Mobile top bar */}
+
             <div className="mobile-topbar">
                 <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
                     <FiMenu />
@@ -50,10 +53,18 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/emp-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <FiUsers className="nav-icon" /> <span>Employee List</span>
+                    </NavLink> 
+
+                     <NavLink to="/admin/attendance" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
+                        <FiCalendar className="nav-icon" /> <span>Attendance List</span>
                     </NavLink>
                  
                     <NavLink to="/admin/pro-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <MdOutlineFolderCopy className="nav-icon"/> <span>Create Project</span>
+                    </NavLink>
+
+                    <NavLink to="/admin/task-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
+                        <MdOutlineAddTask className="nav-icon"/> <span>Task Status Panel</span>
                     </NavLink>
 
                     <NavLink to="/admin/leave-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
@@ -62,10 +73,6 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/permission-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <FiShield className="nav-icon" /> <span>Permission List</span>
-                    </NavLink>
-
-                    <NavLink to="/admin/attendance" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-                        <FiCalendar className="nav-icon" /> <span>Attendance List</span>
                     </NavLink>
 
                     <NavLink to="/admin/add-holiday" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
@@ -77,7 +84,7 @@ const AdminLayout = () => {
                     </NavLink>
 
                     <NavLink to="/admin/add-company" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-                        <GoOrganization className="nav-icon" /> <span>Company Details</span>
+                        <GoOrganization className="nav-icon" /><span>Company Details</span>
                     </NavLink>
 
                     <NavLink to="/admin/raise-ticket" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>

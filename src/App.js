@@ -17,6 +17,7 @@ import ProtectedRoute from './pages/ProtectedRoute';
 import TeamManagement from './pages/TeamManagement';
 import Montlyreport from './pages/Montlyreport';
 import CreateProject from './pages/Createproject';
+import TaskStatusPanel from './pages/TaskStatusPanel';
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="add-team" element={<TeamManagement />} />
             <Route path="emp-list" element={<EmpList />} />
             <Route path="pro-list" element={<CreateProject />} />
+            <Route path="task-list" element={<TaskStatusPanel />} />
             <Route path="leave-list" element={<LeaveList />} />
             <Route path="permission-list" element={<PermissionList />} />
             <Route path="attendance" element={<AttendanceList />} />
@@ -57,7 +59,7 @@ function App() {
         </Routes>
 
       </div>
-      
+
     </Router>
   );
 }

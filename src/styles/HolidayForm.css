@@ -1,12 +1,10 @@
 /* ============================================================
-   HolidayForm.css — Premium redesign (Holiday theme)
-   Font: DM Sans (display) + DM Mono (accents)
-   Palette: warm amber/emerald to evoke festivity
+   HolidayForm.css — Card-style calendar (matches image design)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-/* ── TOKENS ──────────────────────────────────────────────── */
+/* ── TOKENS ── */
 :root {
   --h-bg: #f6f5f1;
   --h-surface: #ffffff;
@@ -15,30 +13,32 @@
   --h-text-1: #111110;
   --h-text-2: #6b6b66;
   --h-text-3: #9b9b94;
-
-  /* accent — warm emerald green (holiday feel) */
   --h-accent: #0d9e6a;
   --h-accent-soft: rgba(13, 158, 106, 0.08);
   --h-accent-mid: rgba(13, 158, 106, 0.18);
   --h-accent-dark: #0a8459;
-
   --h-danger: #e5341a;
   --h-danger-soft: rgba(229, 52, 26, 0.08);
   --h-send: #3b3af7;
   --h-send-soft: rgba(59, 58, 247, 0.09);
-
   --h-radius-sm: 8px;
   --h-radius-md: 12px;
   --h-radius-lg: 18px;
   --h-radius-xl: 24px;
-  --h-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.05);
-  --h-shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
-
-  --font-main: 'DM Sans', sans-serif;
+  --h-shadow-card: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .05);
+  --h-shadow-modal: 0 8px 40px rgba(0, 0, 0, .18), 0 2px 8px rgba(0, 0, 0, .08);
+  --font-main: 'Nunito', sans-serif;
   --font-mono: 'DM Mono', monospace;
+
+  /* ── Cell type colors ── */
+  --col-wh: #FF9500;
+  --col-ch: #8B5CF6;
+  --col-lh: #0F6E56;
+  --col-present: #34C759;
+  --col-absent: #E5E5EA;
+  --col-leave: #3B82F6;
 }
 
-/* ── BASE ────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -54,7 +54,6 @@
   gap: 0;
 }
 
-/* ── FADE IN ─────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -71,7 +70,7 @@
   animation: fadeInUp 0.5s cubic-bezier(.22, .68, 0, 1.2) forwards;
 }
 
-/* ── LOADING ─────────────────────────────────────────────── */
+/* ── LOADING ── */
 .hol-loading {
   display: flex;
   flex-direction: column;
@@ -121,45 +120,7 @@
   }
 }
 
-.hfield select {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: #334155;
-  outline: none;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-/* Hover */
-.hfield select:hover {
-  border-color: #94a3b8;
-}
-
-/* Focus */
-.hfield select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
-}
-
-/* Placeholder (first option) */
-.hfield select option[value=""] {
-  color: #94a3b8;
-}
-
-/* Optional: custom dropdown arrow */
-.hfield select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-}
-
-/* ── HERO HEADER ─────────────────────────────────────────── */
+/* ── HERO ── */
 .hol-hero {
   position: relative;
   background: var(--h-surface);
@@ -177,7 +138,7 @@
   right: -60px;
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(13, 158, 106, 0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(13, 158, 106, .10) 0%, transparent 70%);
   pointer-events: none;
   border-radius: 50%;
 }
@@ -207,9 +168,9 @@
 
 .hol-hero-text h1 {
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--h-text-1);
-  letter-spacing: -0.5px;
+  letter-spacing: -.5px;
   line-height: 1.2;
   margin-bottom: 6px;
 }
@@ -235,7 +196,7 @@
 
 .hol-stat-num {
   font-size: 32px;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--h-accent);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -244,15 +205,15 @@
 
 .hol-stat-label {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--h-accent);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.7;
+  letter-spacing: .08em;
+  opacity: .7;
   display: block;
 }
 
-/* ── TOOLBAR ─────────────────────────────────────────────── */
+/* ── TOOLBAR ── */
 .hol-toolbar {
   display: flex;
   align-items: center;
@@ -268,6 +229,13 @@
   flex-wrap: wrap;
 }
 
+.hol-toolbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .hol-chip {
   display: flex;
   align-items: center;
@@ -277,8 +245,8 @@
   border-radius: var(--h-radius-sm);
   padding: 9px 14px;
   color: var(--h-text-2);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color .2s, box-shadow .2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
 }
 
 .hol-chip:hover {
@@ -292,10 +260,12 @@
   background: transparent;
   font-family: var(--font-main);
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--h-text-1);
   cursor: pointer;
   padding: 0;
+  appearance: none;
+  background-image: none;
 }
 
 .hol-chip svg {
@@ -313,23 +283,50 @@
   padding: 10px 20px;
   font-family: var(--font-main);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(13, 158, 106, 0.28);
-  letter-spacing: -0.2px;
+  transition: background .2s, transform .1s, box-shadow .2s;
+  box-shadow: 0 2px 8px rgba(13, 158, 106, .28);
+  letter-spacing: -.2px;
 }
 
 .hol-add-btn:hover {
   background: var(--h-accent-dark);
-  box-shadow: 0 4px 16px rgba(13, 158, 106, 0.38);
+  box-shadow: 0 4px 16px rgba(13, 158, 106, .38);
 }
 
 .hol-add-btn:active {
   transform: scale(0.97);
 }
 
-/* ── SECTION HEADING ─────────────────────────────────────── */
+.hol-list-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--h-surface);
+  color: var(--h-text-1);
+  border: 1px solid var(--h-border-md);
+  border-radius: var(--h-radius-sm);
+  padding: 10px 18px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .1s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+}
+
+.hol-list-btn:hover {
+  background: var(--h-bg);
+  border-color: var(--h-accent);
+  color: var(--h-accent);
+}
+
+.hol-list-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── SECTION HEADING ── */
 .hol-section-head {
   display: flex;
   align-items: center;
@@ -339,9 +336,9 @@
 
 .hol-section-title {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: .1em;
   color: var(--h-text-3);
   white-space: nowrap;
 }
@@ -352,13 +349,202 @@
   background: var(--h-border);
 }
 
-/* ── CARDS GRID ──────────────────────────────────────────── */
-.hol-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 16px;
+/* ── CALENDAR WRAP ── */
+.hol-calendar-wrap {
+  background: var(--h-surface);
+  border: 1px solid var(--h-border);
+  border-radius: var(--h-radius-xl);
+  box-shadow: var(--h-shadow-card);
+  overflow: hidden;
+  max-width: 520px;
+  /* ← keeps it compact, not full-width */
+  width: 100%;
 }
 
+/* Month title inside calendar */
+.hol-cal-title {
+  padding: 18px 16px 8px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--h-text-1);
+  letter-spacing: -.3px;
+}
+
+/* Day-of-week header row */
+.hol-cal-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 10px;
+  background: transparent;
+}
+
+.hol-cal-day-label {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--h-text-3);
+}
+
+/* ── CALENDAR GRID — card cells ── */
+.hol-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  padding: 6px 10px 10px;
+}
+
+.hol-cal-cell {
+  aspect-ratio: 1;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: #ededea;
+  cursor: pointer;
+  transition: transform .13s ease, filter .13s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.hol-cal-cell:hover {
+  transform: scale(1.06);
+  filter: brightness(.97);
+}
+
+/* Dim cells (prev / next month) */
+.hol-cal-cell--dim {
+  background: #f3f3f0;
+  cursor: default;
+  pointer-events: none;
+}
+
+.hol-cal-cell--dim .hol-cal-num {
+  color: #c9c9c4;
+}
+
+/* Today ring */
+.hol-cal-cell--today {
+  background: #ffffff !important;
+  border: 2.5px solid #111110 !important;
+}
+
+/* ── TYPE FILLS ── */
+.hol-cal-cell--wh {
+  background: var(--col-wh);
+}
+
+.hol-cal-cell--ch {
+  background: var(--col-ch);
+}
+
+.hol-cal-cell--lh {
+  background: var(--col-lh);
+}
+
+.hol-cal-cell--present {
+  background: var(--col-present);
+}
+
+.hol-cal-cell--absent {
+  background: var(--col-absent);
+}
+
+.hol-cal-cell--leave {
+  background: var(--col-leave);
+}
+
+/* Number */
+.hol-cal-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--h-text-1);
+  line-height: 1;
+}
+
+/* White number on colored cells */
+.hol-cal-cell--wh .hol-cal-num,
+.hol-cal-cell--ch .hol-cal-num,
+.hol-cal-cell--lh .hol-cal-num,
+.hol-cal-cell--present .hol-cal-num,
+.hol-cal-cell--leave .hol-cal-num {
+  color: #ffffff;
+}
+
+/* Today circle */
+.hol-cal-num--today {
+  background: #111110;
+  color: #ffffff !important;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Badge text (type label below day number) */
+.hol-cal-badge {
+  font-size: 8px;
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  max-width: 100%;
+  padding: 0 2px;
+}
+
+.hol-cal-cell--absent .hol-cal-badge {
+  color: var(--h-text-2);
+}
+
+/* "Today" soft label (when no holiday badge) */
+.hol-cal-today-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--h-text-3);
+  text-align: center;
+}
+
+/* ── LEGEND ── */
+.hol-cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--h-border);
+  background: #fafaf8;
+  border-radius: 0 0 var(--h-radius-xl) var(--h-radius-xl);
+}
+
+.hol-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hol-legend-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.hol-legend-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--h-text-2);
+}
+
+/* ── CARDS (list modal) ── */
 @keyframes hcardIn {
   from {
     opacity: 0;
@@ -383,12 +569,12 @@
   box-shadow: var(--h-shadow-card);
   overflow: hidden;
   animation: hcardIn 0.4s cubic-bezier(.22, .68, 0, 1.2) both;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
 }
 
 .hol-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .10);
   border-color: var(--h-border-md);
 }
 
@@ -398,7 +584,6 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--h-accent), #5bd4a4);
   border-radius: var(--h-radius-lg) var(--h-radius-lg) 0 0;
 }
 
@@ -412,13 +597,11 @@
 .hol-card-badge {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: var(--h-accent);
-  background: var(--h-accent-soft);
-  border: 1px solid var(--h-accent-mid);
   border-radius: 6px;
   padding: 3px 9px;
-  letter-spacing: 0.03em;
   font-weight: 500;
+  border: 1px solid;
+  letter-spacing: .03em;
 }
 
 .hol-card-actions {
@@ -437,7 +620,7 @@
   justify-content: center;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  transition: background .15s, border-color .15s, transform .1s;
 }
 
 .hca-btn:active {
@@ -462,11 +645,18 @@
   border-color: var(--h-danger);
 }
 
+.hol-card-type {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
 .hol-card-title {
   font-size: 15.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--h-text-1);
-  letter-spacing: -0.3px;
+  letter-spacing: -.3px;
   line-height: 1.3;
 }
 
@@ -477,9 +667,9 @@
   flex: 1;
 }
 
-/* ── EMPTY STATE ─────────────────────────────────────────── */
+/* ── EMPTY STATE ── */
 .hol-empty {
-  grid-column: 1 / -1;
+  grid-column: 1/-1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -506,17 +696,17 @@
   line-height: 1.5;
 }
 
-/* ── MODALS ──────────────────────────────────────────────── */
+/* ── MODALS ── */
 .hmodal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 10, 0.48);
+  background: rgba(10, 10, 10, .48);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 99999;
   backdrop-filter: blur(4px);
-  animation: hoverlayIn 0.2s ease;
+  animation: hoverlayIn .2s ease;
 }
 
 @keyframes hoverlayIn {
@@ -536,14 +726,14 @@
   box-shadow: var(--h-shadow-modal);
   width: 90%;
   max-width: 480px;
-  animation: hmodalIn 0.25s cubic-bezier(.22, .68, 0, 1.2);
+  animation: hmodalIn .25s cubic-bezier(.22, .68, 0, 1.2);
   overflow: hidden;
 }
 
 @keyframes hmodalIn {
   from {
     opacity: 0;
-    transform: scale(0.93) translateY(10px);
+    transform: scale(.93) translateY(10px);
   }
 
   to {
@@ -552,7 +742,6 @@
   }
 }
 
-/* CREATE modal header strip */
 .hmodal-header {
   display: flex;
   align-items: flex-start;
@@ -576,7 +765,7 @@
 
 .hmodal-header h2 {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--h-text-1);
   margin-bottom: 3px;
 }
@@ -603,7 +792,7 @@
   align-items: center;
   justify-content: center;
   color: var(--h-text-2);
-  transition: background 0.15s;
+  transition: background .15s;
 }
 
 .hmodal-close:hover {
@@ -630,10 +819,10 @@
 
 .hfield label {
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--h-text-2);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: .05em;
 }
 
 .hfield input,
@@ -645,7 +834,7 @@
   font-size: 14px;
   color: var(--h-text-1);
   background: var(--h-bg);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color .2s, box-shadow .2s;
   resize: vertical;
   outline: none;
 }
@@ -659,6 +848,38 @@
 
 .hfield textarea {
   min-height: 90px;
+}
+
+.hfield select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-main);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #334155;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+.hfield select:hover {
+  border-color: #94a3b8;
+}
+
+.hfield select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+.hfield select option[value=""] {
+  color: #94a3b8;
 }
 
 .hmodal-actions {
@@ -683,7 +904,7 @@
 
 .hmodal-confirm h2 {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--h-text-1);
   margin-bottom: 8px;
 }
@@ -717,16 +938,82 @@
   color: var(--h-send);
 }
 
-/* BUTTONS */
+/* LIST MODAL */
+.hmodal-list {
+  max-width: 780px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hlist-scroll {
+  overflow-y: auto;
+  padding: 20px;
+  flex: 1;
+}
+
+.hlist-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+/* DETAIL MODAL */
+.hmodal-detail {
+  max-width: 400px;
+}
+
+.hdetail-top {
+  padding: 24px 24px 18px;
+}
+
+.hdetail-type-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.hdetail-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--h-text-1);
+  margin-bottom: 6px;
+}
+
+.hdetail-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--h-text-3);
+}
+
+.hdetail-body {
+  padding: 18px 24px 20px;
+}
+
+.hdetail-body p {
+  font-size: 14px;
+  color: var(--h-text-2);
+  line-height: 1.65;
+}
+
+/* ── BUTTONS ── */
 .hbtn {
   font-family: var(--font-main);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 10px 22px;
   border-radius: var(--h-radius-sm);
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  letter-spacing: -0.2px;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  letter-spacing: -.2px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .hbtn:active {
@@ -747,19 +1034,19 @@
   background: var(--h-accent);
   border: 1px solid transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(13, 158, 106, 0.25);
+  box-shadow: 0 2px 8px rgba(13, 158, 106, .25);
 }
 
 .hbtn-primary:hover {
   background: var(--h-accent-dark);
-  box-shadow: 0 4px 14px rgba(13, 158, 106, 0.32);
+  box-shadow: 0 4px 14px rgba(13, 158, 106, .32);
 }
 
 .hbtn-danger {
   background: var(--h-danger);
   border: 1px solid transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(229, 52, 26, 0.22);
+  box-shadow: 0 2px 8px rgba(229, 52, 26, .22);
 }
 
 .hbtn-danger:hover {
@@ -770,14 +1057,14 @@
   background: var(--h-send);
   border: 1px solid transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(59, 58, 247, 0.22);
+  box-shadow: 0 2px 8px rgba(59, 58, 247, .22);
 }
 
 .hbtn-send:hover {
   background: #2a29e0;
 }
 
-/* ── RESPONSIVE ──────────────────────────────────────────── */
+/* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .hol-page {
     padding: 24px 20px 48px;
@@ -826,14 +1113,30 @@
     flex: 1;
   }
 
-  .hol-add-btn {
+  .hol-toolbar-actions {
+    flex-direction: column;
+  }
+
+  .hol-add-btn,
+  .hol-list-btn {
     justify-content: center;
+    width: 100%;
   }
 
-  .hol-grid {
-    grid-template-columns: 1fr;
+  /* Calendar mobile */
+  .hol-calendar-wrap {
+    max-width: 100%;
   }
 
+  .hol-cal-cell {
+    border-radius: 10px;
+  }
+
+  .hol-cal-badge {
+    font-size: 7px;
+  }
+
+  /* Modals */
   .hmodal-form {
     grid-template-columns: 1fr;
   }
@@ -845,11 +1148,19 @@
   .hmodal-actions {
     grid-column: span 1;
   }
+
+  .hlist-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {
   .hol-hero-text h1 {
     font-size: 20px;
+  }
+
+  .hol-cal-num--today {
+    width: 16px;
   }
 
   .hol-hero-text p {
@@ -863,5 +1174,23 @@
 
   .hmodal {
     border-radius: var(--h-radius-lg);
+  }
+
+  .hol-cal-day-label {
+    font-size: 10px;
+    padding: 6px 2px;
+  }
+
+  .hol-cal-num {
+    font-size: 12px;
+  }
+
+  .hol-cal-badge {
+    font-size: 6.5px;
+  }
+
+  .hol-cal-grid {
+    gap: 3px;
+    padding: 4px 6px 8px;
   }
 }

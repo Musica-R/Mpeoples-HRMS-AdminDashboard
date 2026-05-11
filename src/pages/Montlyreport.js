@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as XLSX from "xlsx-js-style";
 import jsPDF from "jspdf";
@@ -10,11 +10,15 @@ const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 export default function MonthlyReport() {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const selectedEmployee = location.state?.selectedEmployee;
     const userType = location.state?.userType || "emp_present";
 
     const [employees, setEmployees] = useState([]);
-    const [selectedUser, setSelectedUser] = useState("");
+
+    const [selectedUser, setSelectedUser] = useState(
+        selectedEmployee?.id || ""
+    );
+
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [report, setReport] = useState([]);
@@ -46,8 +50,8 @@ export default function MonthlyReport() {
         fetchEmployees();
     }, [userType]);
 
-    // ✅ FETCH REPORT
-    const fetchMonthlyReport = async () => {
+    
+    const fetchMonthlyReport = useCallback(async () => {
         if (!selectedUser) return alert("Select Employee");
 
         try {
@@ -68,13 +72,17 @@ export default function MonthlyReport() {
 
                     absent_days: data.data.absent_days,
                     leave_days: data.data.leave_days,
+
+                    casual_leave: data.data.casual_leave || 0,
+                    lop_leave: data.data.lop_leave || 0,
+
                     total_late_time: data.data.total_late_time,
                 });
             }
         } catch (err) {
             console.error(err);
         }
-    };
+    }, [selectedUser, month, year]);
 
     const formatTotalLateTime = (timeStr) => {
         if (!timeStr || timeStr === "00:00") return "-";
@@ -144,6 +152,8 @@ export default function MonthlyReport() {
                 ["Present Days", summary.present_days],
                 ["Absent Days", summary.absent_days],
                 ["Leave Days", summary.leave_days],
+                ["Paid Leave", summary.paid_leave],
+                ["Loss Pay", summary.losspay_leave],
                 ["Total Late Time", formatTotalLateTime(summary.total_late_time)],
                 [],
             ]
@@ -244,6 +254,8 @@ export default function MonthlyReport() {
                     "Present",
                     "Absent",
                     "Leave",
+                    "Paid Leave",
+                    "Loss Pay",
                     "Late Time"
                 ]],
                 body: [[
@@ -253,6 +265,8 @@ export default function MonthlyReport() {
                     summary.present_days,
                     summary.absent_days,
                     summary.leave_days,
+                    summary.paid_leave,
+                    summary.losspay_leave,
                     formatTotalLateTime(summary.total_late_time),
                 ]],
                 theme: "grid",
@@ -312,6 +326,13 @@ export default function MonthlyReport() {
             "W-H": "Weekend Holiday",
         }[type] || type;   // ✅ fallback to original value
     };
+
+    useEffect(() => {
+    if (selectedUser) {
+        fetchMonthlyReport();
+    }
+}, [selectedUser, fetchMonthlyReport]);
+
     return (
         <div className="monthly-container">
             <button className="back-btn" onClick={() => navigate(-1)}>
@@ -391,6 +412,20 @@ export default function MonthlyReport() {
                         <span className="summary-value">{summary.leave_days}</span>
                     </div>
 
+                    <div className="summary-card paid-leave">
+                        <span className="summary-label">Paid Leave</span>
+                        <span className="summary-value">
+                            {summary.casual_leave}
+                        </span>
+                    </div>
+
+                    <div className="summary-card lop">
+                        <span className="summary-label">Loss Pay</span>
+                        <span className="summary-value">
+                            {summary.lop_leave}
+                        </span>
+                    </div>
+
                     <div className="summary-card late">
                         <span className="summary-label">Total Late</span>
                         <span className="summary-value" style={{ fontFamily: "math" }}>
@@ -411,10 +446,10 @@ export default function MonthlyReport() {
                                 <th>S.No</th>
                                 <th>Date</th>
                                 <th>Check In</th>
-                                <th>Check Out</th>
                                 <th>Break In</th>
                                 <th>Break Out</th>
                                 <th>Total Break</th>
+                                <th>Check Out</th>
                                 <th>Late Check-In</th>
                                 <th>Status</th>
                             </tr>
@@ -425,10 +460,10 @@ export default function MonthlyReport() {
                                     <td>{i + 1}</td>
                                     <td>{formatDate(r.date)}</td>
                                     <td>{formatTime(r.check_in)}</td>
-                                    <td>{formatTime(r.check_out)}</td>
                                     <td>{formatTime(r.break_in)}</td>
                                     <td>{formatTime(r.break_out)}</td>
                                     <td>{formatBreakTime(r.total_break_minutes)}</td>
+                                    <td>{formatTime(r.check_out)}</td>
                                     <td className={r.late_checkin ? "late-text" : ""}>
                                         {formatLateTime(r.late_checkin_time)}
                                     </td>

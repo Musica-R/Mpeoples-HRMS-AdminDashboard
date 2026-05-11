@@ -11,7 +11,6 @@ import {
 import Lottie from "lottie-react";
 import animationData from '../LottieFiles/Allow Permission.json';
 
-// const PERMISSION_LIST_API = '${BASE_URL}/premissionlist';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const STATUS_CONFIG = {
@@ -28,15 +27,6 @@ const STATUS_CONFIG = {
   },
 };
 
-// const defaultOptions = {
-//   loop: true,
-//   autoplay: true,
-//   animationData: animationData,
-//   rendererSettings: {
-//     preserveAspectRatio: 'xMidYMid slice',
-//   },
-// };
-
 export default function PermissionList() {
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,16 +38,12 @@ export default function PermissionList() {
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1);
   const currentYear = now.getFullYear();
-  // const currentYear = new Date().getFullYear();
 
   const [dateFilter, setDateFilter] = useState({
     user_id: '',
     month: currentMonth,
     year: currentYear,
   });
-
-
-
 
   const monthOptions = [
     { label: 'January', value: '1' },
@@ -76,29 +62,23 @@ export default function PermissionList() {
 
   const handleDate = (e) => {
     const { name, value } = e.target;
-
-    setDateFilter((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setDateFilter((prev) => ({ ...prev, [name]: value }));
   };
 
   const updateStatus = async (id, newStatus) => {
     if (updatingId) return;
     try {
       setUpdatingId(id);
-      const res = await fetch(
-        `${BASE_URL}/approve-permission/${id}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
-
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${BASE_URL}/approve-permission/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
       const data = await res.json();
       if (data.success) {
         setPermissions((prev) =>
@@ -124,7 +104,6 @@ export default function PermissionList() {
           `${BASE_URL}/premissionlist?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
         );
         const json = await res.json();
-
         if (json.success) {
           setPermissions(json.data || []);
         } else {
@@ -160,14 +139,9 @@ export default function PermissionList() {
 
   const filtered = permissions.filter((p) => {
     const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
-
-    // normalize search (remove extra spaces + lowercase)
     const search = searchTerm.trim().replace(/\s+/g, ' ').toLowerCase();
     const name = (p.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
-
-    const matchesSearch = name.includes(search);
-
-    return matchesStatus && matchesSearch;
+    return matchesStatus && name.includes(search);
   });
 
   const counts = {
@@ -177,44 +151,21 @@ export default function PermissionList() {
     rejected: permissions.filter((p) => p.status === 'rejected').length,
   };
 
-
   const formatMinutes = (minutes) => {
-  const totalMinutes = Math.round(parseFloat(minutes));
-
-  const hrs = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-
-  if (hrs === 0) return `${mins} min`;
-  if (mins === 0) return `${hrs} hr`;
-
-  return `${hrs} hr ${mins} min`;
-};
-
-  // const formatDuration = (value) => {
-  //   if (!value) return '—';
-
-  //   const num = parseFloat(value);
-
-  //   // If less than 1 hour → convert to minutes
-  //   if (num < 1) {
-  //     return `${Math.round(num * 100)} min`;
-  //   }
-
-  //   const hours = Math.floor(num);
-  //   const minutes = Math.round((num - hours) * 100);
-
-  //   if (minutes === 0) {
-  //     return `${hours} hr`;
-  //   }
-
-  //   return `${hours} hr ${minutes} min`;
-  // };
+    const totalMinutes = Math.round(parseFloat(minutes));
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    if (hrs === 0) return `${mins} min`;
+    if (mins === 0) return `${hrs} hr`;
+    return `${hrs} hr ${mins} min`;
+  };
 
   return (
     <div className="permission-page fade-in">
+
+      {/* ── HEADER ── */}
       <div className="permission-header">
         <div className="permission-title-group">
-          {/* <Lottie options={defaultOptions} height={70} width={70} /> */}
           <Lottie animationData={animationData} style={{ width: "70px", height: "90px" }} />
           <div>
             <h1>Permission List</h1>
@@ -228,7 +179,7 @@ export default function PermissionList() {
             <input
               type="text"
               className="pl-search-input"
-              placeholder="Search by ID, reason..."
+              placeholder="Search by name, reason…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -236,11 +187,7 @@ export default function PermissionList() {
           <button
             className={`pl-refresh-btn ${loading ? 'spinning' : ''}`}
             onClick={() =>
-              setDateFilter({
-                user_id: '',
-                month: currentMonth,
-                year: currentYear,
-              })
+              setDateFilter({ user_id: '', month: currentMonth, year: currentYear })
             }
             disabled={loading}
           >
@@ -249,35 +196,27 @@ export default function PermissionList() {
         </div>
       </div>
 
-      <div
-        style={{ display: 'flex', width: '100%', gap: '30px', padding: '10px' }}
-      >
+      {/* ── DATE FILTERS ── */}
+      <div style={{ display: 'flex', width: '100%', gap: '30px', padding: '10px' }}>
         <div className="form-group">
           <label>Month Filter</label>
           <select name="month" value={dateFilter.month} onChange={handleDate}>
             {monthOptions.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
+              <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
         </div>
         <div className="form-group">
           <label>Year Filter</label>
-
-
           <select name="year" value={dateFilter.year} onChange={handleDate}>
             {Array.from({ length: 11 }, (_, i) => currentYear - 5 + i).map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
+              <option key={y} value={y}>{y}</option>
             ))}
           </select>
-
-
         </div>
       </div>
 
+      {/* ── TABS ── */}
       <div className="pl-tabs">
         {['all', 'approved', 'pending', 'rejected'].map((s) => (
           <button
@@ -291,6 +230,7 @@ export default function PermissionList() {
         ))}
       </div>
 
+      {/* ── SUMMARY CARDS ── */}
       <div className="pl-summary-grid">
         <div className="pl-summary-card pl-summary-total">
           <span className="pl-card-num">{counts.all}</span>
@@ -310,30 +250,27 @@ export default function PermissionList() {
         </div>
       </div>
 
+      {/* ── LOADING ── */}
       {loading && permissions.length === 0 ? (
         <div className="pl-center">
-          <div className="pl-spinner"></div>
-          <p>Fetching permissions...</p>
+          <div className="pl-spinner" />
+          <p>Fetching permissions…</p>
         </div>
       ) : error ? (
+        /* ── ERROR ── */
         <div className="pl-error">
-          <span>
-            <FiAlertCircle /> {error}
-          </span>
+          <span><FiAlertCircle /> {error}</span>
           <button
             className="pl-retry-btn"
             onClick={() =>
-              setDateFilter({
-                user_id: '',
-                month: currentMonth,
-                year: currentYear,
-              })
+              setDateFilter({ user_id: '', month: currentMonth, year: currentYear })
             }
           >
             Retry
           </button>
         </div>
       ) : (
+        /* ── TABLE ── */
         <div className="pl-table-container">
           <table className="pl-table">
             <thead>
@@ -348,47 +285,68 @@ export default function PermissionList() {
                 <th>Status</th>
                 <th>Applied On</th>
                 <th style={{ textAlign: 'center' }}>Actions</th>
+                <th>Approved By</th>
               </tr>
             </thead>
+
             <tbody>
               {filtered.length > 0 ? (
                 filtered.map((p, idx) => {
                   const sc = STATUS_CONFIG[p.status] || STATUS_CONFIG.pending;
                   return (
                     <tr key={p.id}>
+                      {/* S.No */}
                       <td>{idx + 1}</td>
+
+                      {/* Permission ID */}
                       <td>
                         <span className="pl-id-badge">#{p.id}</span>
                       </td>
 
+                      {/* Name */}
                       <td>
-                        <span className="pl-reason-text">{p.name}</span>
+                        <span className="pl-name-cell">{p.name}</span>
                       </td>
 
-                      <td>{formatDate(p.attendance_date)}</td>
+                      {/* Date */}
+                      <td style={{ whiteSpace: 'nowrap', fontWeight: 500, color: '#475569', fontSize: '13px' }}>
+                        {formatDate(p.attendance_date)}
+                      </td>
+
+                      {/* Time Slot */}
                       <td>
                         <span className="pl-time-badge">
-                          {formatTime(p.start_time)} - {formatTime(p.end_time)}
+                          {formatTime(p.start_time)} – {formatTime(p.end_time)}
                         </span>
                       </td>
+
+                      {/* Duration */}
                       <td>
                         <span className="pl-hours">
-                         {formatMinutes(p.permission_hours)}
+                          {formatMinutes(p.permission_hours)}
                         </span>
                       </td>
+
+                      {/* Reason — full content, no clamp */}
                       <td className="pl-reason-cell">
-                        <div className="pl-reason-text" title={p.reason}>
-                          {p.reason}
+                        <div className="pl-reason-text">
+                          {p.reason || '—'}
                         </div>
                       </td>
+
+                      {/* Status */}
                       <td>
                         <span className={`pl-status ${sc.cls}`}>
                           {sc.icon} {sc.label}
                         </span>
                       </td>
-                      <td style={{ color: '#94a3b8', fontSize: '12px' }}>
+
+                      {/* Applied On */}
+                      <td style={{ color: '#94a3b8', fontSize: '12px', whiteSpace: 'nowrap' }}>
                         {formatDate(p.created_at)}
                       </td>
+
+                      {/* Actions */}
                       <td style={{ textAlign: 'center' }}>
                         {p.status === 'pending' ? (
                           <select
@@ -402,26 +360,49 @@ export default function PermissionList() {
                             <option value="rejected">Reject</option>
                           </select>
                         ) : (
-                          <span
-                            style={{
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              color: '#94a3b8',
-                            }}
-                          >
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                             {sc.icon} {sc.label}
                           </span>
                         )}
                       </td>
+
+                      {/* Approved By */}
+
+                      <td style={{ whiteSpace: 'nowrap' }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '3px 10px',
+                            borderRadius: '999px',
+                            background: p.approved_position === 'HR' ? '#dbeafe' : '#dcfce7',
+                            color: p.approved_position === 'HR' ? '#1d4ed8' : '#166534',
+                            fontWeight: 700,
+                            fontSize: '12px',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          {p.approved_position || '—'}
+                        </span>
+
+                        <br />
+
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            color: '#94a3b8',
+                            fontWeight: 400,
+                          }}
+                        >
+                          {/* {p.approved_by || '—'} */}
+                        </span>
+                      </td>
+
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td
-                    colSpan="9"
-                    style={{ textAlign: 'center', padding: '40px' }}
-                  >
+                  <td colSpan="11" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
                     No permission records found.
                   </td>
                 </tr>

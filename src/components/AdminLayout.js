@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet} from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { FiHome, FiLogOut, FiCalendar, FiUsers, FiMenu, FiX, FiFileText, FiShield } from 'react-icons/fi';
 import '../styles/AdminLayout.css';
 import { BsSuitcase2 } from 'react-icons/bs';
@@ -8,9 +8,11 @@ import { GoOrganization } from 'react-icons/go';
 import { IoTicketOutline } from 'react-icons/io5';
 import { MdOutlineFolderCopy } from "react-icons/md";
 import { MdOutlineAddTask } from "react-icons/md";
+import logo from "../assets/ass.jpeg";
+import { BsCurrencyDollar } from "react-icons/bs";
 
 const AdminLayout = () => {
-    
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleLogout = () => {
@@ -27,10 +29,16 @@ const AdminLayout = () => {
             {/* Mobile top bar */}
 
             <div className="mobile-topbar">
+
                 <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
                     <FiMenu />
                 </button>
-                <h2 className="mobile-brand">Admin Panel</h2>
+
+                <div className="brand-section">
+                    <img src={logo} alt="Logo" className="brand-logo" />
+                    <h2 className="mobile-brand">Admin Panel</h2>
+                </div>
+
             </div>
 
             {/* Overlay for mobile sidebar list*/}
@@ -41,8 +49,16 @@ const AdminLayout = () => {
             <aside className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`}>
 
                 <div className="sidebar-header">
-                    <h2>Admin Panel</h2>
-                    <button className="sidebar-close-btn" onClick={closeSidebar}> <FiX /> </button>
+
+                    <div className="brand-section">
+                        <img src={logo} alt="Logo" className="brand-logo" />
+                        <h2>Admin Panel</h2>
+                    </div>
+
+                    <button className="sidebar-close-btn" onClick={closeSidebar}>
+                        <FiX />
+                    </button>
+
                 </div>
 
                 <nav className="sidebar-nav">
@@ -53,18 +69,18 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/emp-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <FiUsers className="nav-icon" /> <span>Employee List</span>
-                    </NavLink> 
+                    </NavLink>
 
-                     <NavLink to="/admin/attendance" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
+                    <NavLink to="/admin/attendance" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <FiCalendar className="nav-icon" /> <span>Attendance List</span>
                     </NavLink>
-                 
+
                     <NavLink to="/admin/pro-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-                        <MdOutlineFolderCopy className="nav-icon"/> <span>Create Project</span>
+                        <MdOutlineFolderCopy className="nav-icon" /> <span>Create Project</span>
                     </NavLink>
 
                     <NavLink to="/admin/task-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
-                        <MdOutlineAddTask className="nav-icon"/> <span>Task Status Panel</span>
+                        <MdOutlineAddTask className="nav-icon" /> <span>Task Status Panel</span>
                     </NavLink>
 
                     <NavLink to="/admin/leave-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
@@ -73,6 +89,10 @@ const AdminLayout = () => {
 
                     <NavLink to="/admin/permission-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
                         <FiShield className="nav-icon" /> <span>Permission List</span>
+                    </NavLink>
+
+                    <NavLink to="/admin/payroll-list" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
+                        <BsCurrencyDollar className="nav-icon" /> <span>Payroll</span>
                     </NavLink>
 
                     <NavLink to="/admin/add-holiday" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={closeSidebar}>
@@ -97,11 +117,27 @@ const AdminLayout = () => {
                         <FiLogOut className="nav-icon" /><span>Logout</span>
                     </button>
                 </div>
+                
             </aside>
 
             <main className="main-content">
                 <Outlet />
             </main>
+
+            {/* <div className="content-area">
+
+                <header className="content-header">
+                    <button onClick={handleLogout} className="top-logout-btn">
+                        Logout
+                    </button>
+                </header>
+
+                <main className="main-content">
+                    <Outlet />
+                </main>
+
+            </div> */}
+
         </div>
     );
 };

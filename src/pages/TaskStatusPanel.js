@@ -11,17 +11,73 @@ const TASK_API = "https://mps.mpdatahub.com/api";
 
 /* ── Lookup tables ──────────────────────────────────────────────── */
 const STATUS_META = {
-    todo: { label: "To Do", icon: <FiClock />, cls: "tsp-status-todo" },
-    in_progress: { label: "In Progress", icon: <FiRefreshCw />, cls: "tsp-status-in_progress" },
-    completed: { label: "Completed", icon: <FiCheckCircle />, cls: "tsp-status-completed" },
-    pending: { label: "Pending", icon: <FiWatch />, cls: "tsp-status-pending" },
-    hold: { label: "Hold", icon: <FiPauseCircle />, cls: "tsp-status-hold" },
+    todo: {
+        label: "To Do",
+        icon: <FiClock />,
+        cls: "tsp-status-todo"
+    },
+
+    pending: {
+        label: "Pending",
+        icon: <FiWatch />,
+        cls: "tsp-status-pending"
+    },
+
+    "in-progress": {
+        label: "In Progress",
+        icon: <FiRefreshCw />,
+        cls: "tsp-status-in_progress"
+    },
+
+    completed: {
+        label: "Completed",
+        icon: <FiCheckCircle />,
+        cls: "tsp-status-completed"
+    },
+
+    hold: {
+        label: "Hold",
+        icon: <FiPauseCircle />,
+        cls: "tsp-status-hold"
+    },
+
+    not_completed: {
+        label: "Not Completed",
+        icon: <FiPauseCircle />,
+        cls: "tsp-status-not_completed"
+    },
 };
 
 const PRIORITY_META = {
-    low: { label: "Low", cls: "tsp-priority-low", dot: "tsp-dot-low" },
-    medium: { label: "Medium", cls: "tsp-priority-medium", dot: "tsp-dot-medium" },
-    high: { label: "High", cls: "tsp-priority-high", dot: "tsp-dot-high" },
+    very_low: {
+        label: "Very Low",
+        cls: "tsp-priority-very-low",
+        dot: "tsp-dot-very-low"
+    },
+
+    low: {
+        label: "Low",
+        cls: "tsp-priority-low",
+        dot: "tsp-dot-low"
+    },
+
+    medium: {
+        label: "Medium",
+        cls: "tsp-priority-medium",
+        dot: "tsp-dot-medium"
+    },
+
+    high: {
+        label: "High",
+        cls: "tsp-priority-high",
+        dot: "tsp-dot-high"
+    },
+
+    very_high: {
+        label: "Very High",
+        cls: "tsp-priority-very-high",
+        dot: "tsp-dot-very-high"
+    },
 };
 
 const AVATAR_PALETTE = ["tsp-av-0", "tsp-av-1", "tsp-av-2", "tsp-av-3", "tsp-av-4", "tsp-av-5"];
@@ -76,7 +132,7 @@ function UserCell({ name }) {
 /* ── Summary Bar — hardcoded structure, no .map() ──────────────── */
 function SummaryBar({ s, onFilter, active }) {
 
-   
+
 
     return (
         <div className="tsp-summary-bar">
@@ -98,8 +154,8 @@ function SummaryBar({ s, onFilter, active }) {
             </div>
 
             <div
-                className={`tsp-summary-item tsp-stat-inprogress ${active === "in_progress" ? "active" : ""}`}
-                onClick={() => onFilter("in_progress")}
+                className={`tsp-summary-item tsp-stat-inprogress ${active === "in-progress" ? "active" : ""}`}
+               onClick={() => onFilter("in-progress")}
             >
                 <span className="tsp-summary-num">{s.in_progress ?? 0}</span>
                 <span className="tsp-summary-lbl">In Progress</span>
@@ -241,10 +297,10 @@ export default function TaskStatusPanel() {
 
     const [statusFilter, setStatusFilter] = useState("all");
 
-     const filterTasks = (tasks) => {
-    if (!statusFilter || statusFilter === "all") return tasks;
-    return tasks?.filter(t => t.status === statusFilter);
-};
+    const filterTasks = (tasks) => {
+        if (!statusFilter || statusFilter === "all") return tasks;
+        return tasks?.filter(t => t.status === statusFilter);
+    };
 
     /* Fetch team list on mount */
     useEffect(() => {
@@ -265,7 +321,7 @@ export default function TaskStatusPanel() {
         if (!selectedTeam) { setTaskData(null); return; }
 
         setStatusFilter("all");
-        
+
         const load = async () => {
             setTasksLoading(true);
             try {

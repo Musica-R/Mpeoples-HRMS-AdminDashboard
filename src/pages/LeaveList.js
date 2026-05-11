@@ -12,7 +12,6 @@ import {
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-// const LEAVE_LIST_API = `${BASE_URL}/leave-list`;
 const UPDATE_STATUS_API = `${BASE_URL}/update-Leave-status`;
 
 const STATUS_CONFIG = {
@@ -33,6 +32,17 @@ function formatDate(dateStr) {
     month: 'short',
     year: 'numeric',
   });
+}
+
+/* Map leave type → chip class */
+function leaveTypeClass(type) {
+  if (!type) return 'default';
+  const t = type.toUpperCase();
+  if (t === 'LOP') return 'lop';
+  if (t === 'CASUAL') return 'casual';
+  if (t === 'SICK') return 'sick';
+  if (t === 'EARNED') return 'earned';
+  return 'default';
 }
 
 export default function LeaveList() {
@@ -71,11 +81,7 @@ export default function LeaveList() {
 
   const handleDate = (e) => {
     const { name, value } = e.target;
-
-    setDateFilter((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setDateFilter((prev) => ({ ...prev, [name]: value }));
   };
 
   useEffect(() => {
@@ -83,18 +89,13 @@ export default function LeaveList() {
       try {
         setLoading(true);
         setError(null);
-
         const res = await fetch(
           `${BASE_URL}/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
         );
         const json = await res.json();
-
         if (json.success) {
           setLeaves(json.data);
-          setMeta({
-            month: json.month,
-            total: json.total_leaves,
-          });
+          setMeta({ month: json.month, total: json.total_leaves });
         } else {
           setError('Failed to load leave records.');
         }
@@ -107,52 +108,21 @@ export default function LeaveList() {
     fetchLeaves();
   }, [dateFilter]);
 
-  // const fetchLeaves = async () => {
-  //   try {
-  //     setLoading(true);
-  //     setError(null);
-
-  //     const res = await fetch(
-  //       `${BASE_URL}/leave-list?user_id=${dateFilter.user_id}&month=${dateFilter.month}&year=${dateFilter.year}`
-  //     );
-  //     const json = await res.json();
-
-  //     if (json.success) {
-  //       setLeaves(json.data);
-  //       setMeta({
-  //         month: json.month,
-  //         total: json.total_leaves,
-  //       });
-  //     } else {
-  //       setError('Failed to load leave records.');
-  //     }
-  //   } catch (err) {
-  //     setError('Network error. Please try again.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const updateStatus = async (leaveId, newStatus) => {
     if (updatingId) return;
-
     try {
       setUpdatingId(leaveId);
-
+      const token = localStorage.getItem('token');
       const res = await fetch(UPDATE_STATUS_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          leave_id: leaveId,
-          status: newStatus,
-        }),
+        body: JSON.stringify({ leave_id: leaveId, status: newStatus }),
       });
-
       const data = await res.json();
-
       if (res.ok && data.success) {
         setLeaves((prev) =>
           prev.map((l) => (l.id === leaveId ? { ...l, status: newStatus } : l))
@@ -169,14 +139,9 @@ export default function LeaveList() {
 
   const filtered = leaves.filter((l) => {
     const matchStatus = filterStatus === 'all' || l.status === filterStatus;
-
-    // normalize search (remove extra spaces + lowercase)
     const search = searchTerm.trim().replace(/\s+/g, ' ').toLowerCase();
     const name = (l.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
-
-    const matchSearch = name.includes(search);
-
-    return matchStatus && matchSearch;
+    return matchStatus && name.includes(search);
   });
 
   const counts = {
@@ -188,18 +153,12 @@ export default function LeaveList() {
 
   function formatDuration(duration) {
     const d = parseFloat(duration);
-
     if (d === 0.5) return 'Half Day';
-
-    if (d % 1 === 0) {
-      return `${d} Day${d > 1 ? 's' : ''}`;
-    }
-
+    if (d % 1 === 0) return `${d} Day${d > 1 ? 's' : ''}`;
     if (d % 1 === 0.5) {
       const fullDays = Math.floor(d);
       return `${fullDays} Day${fullDays > 1 ? 's' : ''} + Half Day`;
     }
-
     return duration;
   }
 
@@ -210,10 +169,10 @@ export default function LeaveList() {
 
   return (
     <div className="leavelist-page">
+      {/* ── HEADER ── */}
       <div className="leavelist-header">
         <div className="leavelist-title">
           <FiCalendar className="ll-title-icon" />
-
           <div>
             <h1>Leave Management</h1>
             <p>
@@ -226,11 +185,10 @@ export default function LeaveList() {
         <div className="leavelist-controls">
           <div className="ll-search-wrap">
             <FiSearch className="ll-search-icon" />
-
             <input
               type="text"
               className="ll-search"
-              placeholder="Search by ID, name, emp id..."
+              placeholder="Search by name, emp id…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -239,11 +197,7 @@ export default function LeaveList() {
           <button
             className="ll-refresh-btn"
             onClick={() =>
-              setDateFilter({
-                user_id: '',
-                month: currentMonth,
-                year: currentYear,
-              })
+              setDateFilter({ user_id: '', month: currentMonth, year: currentYear })
             }
             title="Refresh"
           >
@@ -252,33 +206,27 @@ export default function LeaveList() {
         </div>
       </div>
 
-      <div
-        style={{ display: 'flex', width: '100%', gap: '30px', padding: '10px' }}
-      >
+      {/* ── DATE FILTERS ── */}
+      <div style={{ display: 'flex', width: '100%', gap: '30px', padding: '10px' }}>
         <div className="form-group">
           <label>Month Filter</label>
           <select name="month" value={dateFilter.month} onChange={handleDate}>
             {monthOptions.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
+              <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
         </div>
         <div className="form-group">
           <label>Year Filter</label>
-
           <select name="year" value={dateFilter.year} onChange={handleDate}>
             {Array.from({ length: 10 }, (_, i) => currentYear - 5 + i).map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
+              <option key={y} value={y}>{y}</option>
             ))}
           </select>
-
         </div>
       </div>
 
+      {/* ── TABS ── */}
       <div className="ll-tabs">
         {['all', 'approved', 'pending', 'rejected'].map((s) => (
           <button
@@ -287,12 +235,12 @@ export default function LeaveList() {
             onClick={() => setFilterStatus(s)}
           >
             {s.charAt(0).toUpperCase() + s.slice(1)}
-
             <span className="ll-tab-count">{counts[s]}</span>
           </button>
         ))}
       </div>
 
+      {/* ── LOADING ── */}
       {loading && leaves.length === 0 && (
         <div className="ll-center">
           <div className="ll-spinner" />
@@ -300,19 +248,15 @@ export default function LeaveList() {
         </div>
       )}
 
+      {/* ── ERROR ── */}
       {error && (
         <div className="ll-error">
           <FiAlertCircle />
           {error}
-
           <button
             className="ll-retry"
             onClick={() =>
-              setDateFilter({
-                user_id: '',
-                month: currentMonth,
-                year: currentYear,
-              })
+              setDateFilter({ user_id: '', month: currentMonth, year: currentYear })
             }
           >
             Retry
@@ -320,23 +264,21 @@ export default function LeaveList() {
         </div>
       )}
 
+      {/* ── SUMMARY CARDS ── */}
       {!loading && !error && leaves.length > 0 && (
         <div className="ll-summary-row">
           <div className="ll-summary-card ll-summary--total">
             <span className="ll-sum-num">{counts.all}</span>
             <span className="ll-sum-label">Total Applied</span>
           </div>
-
           <div className="ll-summary-card ll-summary--approved">
             <span className="ll-sum-num">{counts.approved}</span>
             <span className="ll-sum-label">Approved</span>
           </div>
-
           <div className="ll-summary-card ll-summary--pending">
             <span className="ll-sum-num">{counts.pending}</span>
             <span className="ll-sum-label">Pending</span>
           </div>
-
           <div className="ll-summary-card ll-summary--rejected">
             <span className="ll-sum-num">{counts.rejected}</span>
             <span className="ll-sum-label">Rejected</span>
@@ -344,6 +286,7 @@ export default function LeaveList() {
         </div>
       )}
 
+      {/* ── TABLE ── */}
       {!loading && !error && (
         <>
           {filtered.length === 0 ? (
@@ -362,27 +305,30 @@ export default function LeaveList() {
                     <th>Leave Type</th>
                     <th>Reason</th>
                     <th>Applied On</th>
-                    <th>Leave Duration</th>
+                    <th>Duration</th>
                     <th>Session</th>
                     <th>Status</th>
                     <th className="ll-txt-center">Actions</th>
+                    <th>Approved By</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {filtered.map((leave, idx) => {
-                    const sc =
-                      STATUS_CONFIG[leave.status] || STATUS_CONFIG.pending;
+                    const sc = STATUS_CONFIG[leave.status] || STATUS_CONFIG.pending;
                     const isUpdating = updatingId === leave.id;
 
                     return (
                       <tr key={leave.id} className="ll-row">
+                        {/* # */}
                         <td className="ll-idx">{idx + 1}</td>
 
+                        {/* Leave ID */}
                         <td className="ll-id-cell">
                           <span className="ll-id-badge">#{leave.id}</span>
                         </td>
 
+                        {/* Employee */}
                         <td>
                           <div className="ll-emp-info">
                             <span className="ll-name">{leave.name}</span>
@@ -390,44 +336,51 @@ export default function LeaveList() {
                           </div>
                         </td>
 
-                        <td className="ll-date">
-                          {formatDate(leave.leave_date)}
-                        </td>
+                        {/* Leave Date */}
+                        <td className="ll-date">{formatDate(leave.leave_date)}</td>
 
+                        {/* Leave Type — coloured chip */}
                         <td className="ll-type">
-                          {leave.leave_type || '—'}
+                          <span className={`ll-type-chip ${leaveTypeClass(leave.leave_type)}`}>
+                            {leave.leave_type || '—'}
+                          </span>
                         </td>
 
-
+                        {/* Reason — full content, no clamp */}
                         <td className="ll-reason-cell">
-                          <div className="ll-reason-text" title={leave.reason}>
+                          <div className="ll-reason-text">
                             {leave.reason || '—'}
                           </div>
                         </td>
 
-                        <td className="ll-date ll-dim">
-                          {formatDate(leave.created_at)}
+                        {/* Applied On */}
+                        <td className="ll-date ll-dim">{formatDate(leave.created_at)}</td>
+
+                        {/* Duration */}
+                        <td style={{ whiteSpace: 'nowrap', fontWeight: 500 }}>
+                          {formatDuration(leave.duration)}
                         </td>
 
-                        <td>{formatDuration(leave.duration)}</td>
+                        {/* Session */}
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          {formatHalfDay(leave.half_day)}
+                        </td>
 
-                        <td>{formatHalfDay(leave.half_day)}</td>
-
+                        {/* Status badge */}
                         <td>
                           <span className={`ll-status ${sc.cls}`}>
                             {sc.icon} {sc.label}
                           </span>
                         </td>
 
+                        {/* Actions */}
                         <td className="ll-txt-center">
                           {leave.status === 'pending' ? (
                             <select
                               className="ll-status-dropdown"
                               value={leave.status || 'pending'}
                               disabled={isUpdating}
-                              onChange={(e) =>
-                                updateStatus(leave.id, e.target.value)
-                              }
+                              onChange={(e) => updateStatus(leave.id, e.target.value)}
                             >
                               <option value="pending">Pending</option>
                               <option value="approved">Approved</option>
@@ -435,11 +388,42 @@ export default function LeaveList() {
                             </select>
                           ) : (
                             <span className="ll-status-fixed">
-                              {' '}
                               {sc.icon} {sc.label}
                             </span>
                           )}
                         </td>
+
+                        {/* Approved By */}
+
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '3px 10px',
+                              borderRadius: '999px',
+                              background: leave.approved_position === 'HR' ? '#dbeafe' : '#dcfce7',
+                              color: leave.approved_position === 'HR' ? '#1d4ed8' : '#166534',
+                              fontWeight: 700,
+                              fontSize: '12px',
+                              marginBottom: '4px',
+                            }}
+                          >
+                            {leave.approved_position || '—'}
+                          </span>
+
+                          <br />
+
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              color: '#94a3b8',
+                              fontWeight: 400,
+                            }}
+                          >
+                            {/* {leave.approved_by || '—'} */}
+                          </span>
+                        </td>
+
                       </tr>
                     );
                   })}

@@ -224,6 +224,7 @@ export default function EmpList() {
       joining_date: emp.joining_date || '',
       experience: emp.experience || '',
       employee_status: emp.employee_status || '',
+      salary: emp.salary || '',
       start_time: emp.start_time ? emp.start_time.slice(0, 5) : '',
       end_time: emp.end_time ? emp.end_time.slice(0, 5) : '',
 
@@ -261,6 +262,7 @@ export default function EmpList() {
       if (editData.joining_date) formData.append('joining_date', editData.joining_date);
       if (editData.experience) formData.append('experience', editData.experience);
       if (editData.employee_status) formData.append('employee_status', editData.employee_status);
+      if (editData.salary) formData.append('salary', editData.salary);
 
       if (editData.role_id) formData.append('role_id', editData.role_id);
 
@@ -398,10 +400,11 @@ export default function EmpList() {
         <p><strong>Qualification:</strong>{emp.qualification || 'N/A'}</p>
         <p><strong>Joining Date:</strong> {emp.joining_date || 'N/A'}</p>
         <p><strong>Experience:</strong>   {emp.experience || 'N/A'}</p>
+        <p><strong>Salary:</strong> ₹{emp.salary || '0'}</p>
         <p><strong>Status:</strong>       {emp.employee_status || 'N/A'}</p>
         <p><strong>Role:</strong>       {emp.role_name || 'N/A'}</p>
 
-       
+
 
         <div className="emp-card-actions">
           <label className="switch">
@@ -416,7 +419,21 @@ export default function EmpList() {
         </div>
       </div>
 
-      <div className="emp-card-actions">
+      <div className="emp-card-actions report">
+
+        <button
+          className="btn-view-report"
+          onClick={() =>
+            navigate("/admin/monthly-report", {
+              state: {
+                selectedEmployee: emp,
+              },
+            })
+          }
+        >
+          View Report
+        </button>
+
         {showDelete ? (
           <button className="btn-delete" onClick={() => openDelete(emp.id)}>Delete</button>
         ) : (
@@ -610,42 +627,182 @@ export default function EmpList() {
             {saveError && <div className="modal-api-error">{saveError}</div>}
 
             <div className="modal-form">
-              <input name="name" value={editData.name} onChange={handleEditChange} placeholder="Name" />
-              <input name="empid" value={editData.empid} onChange={handleEditChange} placeholder="Emp ID" />
-              <input name="email" value={editData.email} onChange={handleEditChange} placeholder="Email" />
-              <input name="mobile" value={editData.mobile} onChange={handleEditChange} placeholder="Mobile" />
-              <input name="position" value={editData.position} onChange={handleEditChange} placeholder="Position" />
-              <input type="date" name="dob" value={editData.dob} onChange={handleEditChange} />
-              <input name="address" value={editData.address} onChange={handleEditChange} placeholder="Address" />
-              <input type="time" name="start_time" value={editData.start_time} onChange={handleEditChange} />
-              <input type="time" name="end_time" value={editData.end_time} onChange={handleEditChange} />
-              <select name="designation" value={editData.designation} onChange={handleEditChange}>
-                <option value="">Select Designation</option>
-                <option value="TL">Team Lead (TL)</option>
-                <option value="TM">Team Member (TM)</option>
-              </select>
-              <input name="qualification" value={editData.qualification} onChange={handleEditChange} placeholder="Qualification" />
-              <input type="date" name="joining_date" value={editData.joining_date} onChange={handleEditChange} />
-              <input name="experience" value={editData.experience} onChange={handleEditChange} placeholder="Experience" />
-              <select name="employee_status" value={editData.employee_status} onChange={handleEditChange}>
-                <option value="">Select Status</option>
-                <option value="working">Working</option>
-                <option value="notice_period">Notice Period</option>
-                <option value="relieved">Relieved</option>
-              </select>
 
-              <input
-                type="file"
-                name="profile_img"
-                accept="image/*"
-                onChange={(e) =>
-                  setEditData((prev) => ({
-                    ...prev,
-                    profile_img: e.target.files[0],
-                  }))
-                }
-              />
-              <div className="form-group">
+              <div className="form-group-edit">
+                <label>Name</label>
+                <input
+                  name="name"
+                  value={editData.name}
+                  onChange={handleEditChange}
+                  placeholder="Name"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Employee ID</label>
+                <input
+                  name="empid"
+                  value={editData.empid}
+                  onChange={handleEditChange}
+                  placeholder="Emp ID"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Email</label>
+                <input
+                  name="email"
+                  value={editData.email}
+                  onChange={handleEditChange}
+                  placeholder="Email"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Mobile</label>
+                <input
+                  name="mobile"
+                  value={editData.mobile}
+                  onChange={handleEditChange}
+                  placeholder="Mobile"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Position</label>
+                <input
+                  name="position"
+                  value={editData.position}
+                  onChange={handleEditChange}
+                  placeholder="Position"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Date of Birth</label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={editData.dob}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Address</label>
+                <input
+                  name="address"
+                  value={editData.address}
+                  onChange={handleEditChange}
+                  placeholder="Address"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  name="start_time"
+                  value={editData.start_time}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>End Time</label>
+                <input
+                  type="time"
+                  name="end_time"
+                  value={editData.end_time}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Designation</label>
+                <select
+                  name="designation"
+                  value={editData.designation}
+                  onChange={handleEditChange}
+                >
+                  <option value="">Select Designation</option>
+                  <option value="TL">Team Lead (TL)</option>
+                  <option value="TM">Team Member (TM)</option>
+                </select>
+              </div>
+
+              <div className="form-group-edit">
+                <label>Qualification</label>
+                <input
+                  name="qualification"
+                  value={editData.qualification}
+                  onChange={handleEditChange}
+                  placeholder="Qualification"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Joining Date</label>
+                <input
+                  type="date"
+                  name="joining_date"
+                  value={editData.joining_date}
+                  onChange={handleEditChange}
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Experience</label>
+                <input
+                  name="experience"
+                  value={editData.experience}
+                  onChange={handleEditChange}
+                  placeholder="Experience"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Employee Status</label>
+                <select
+                  name="employee_status"
+                  value={editData.employee_status}
+                  onChange={handleEditChange}
+                >
+                  <option value="">Select Status</option>
+                  <option value="working">Working</option>
+                  <option value="notice_period">Notice Period</option>
+                  <option value="relieved">Relieved</option>
+                </select>
+              </div>
+
+              <div className="form-group-edit">
+                <label>Salary</label>
+                <input
+                  type="number"
+                  name="salary"
+                  value={editData.salary}
+                  onChange={handleEditChange}
+                  placeholder="Salary"
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Profile Image</label>
+                <input
+                  type="file"
+                  name="profile_img"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setEditData((prev) => ({
+                      ...prev,
+                      profile_img: e.target.files[0],
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="form-group-edit">
+                <label>Role</label>
                 <select
                   name="role_id"
                   value={editData.role_id}
@@ -662,24 +819,25 @@ export default function EmpList() {
                   ))}
                 </select>
               </div>
-           
-            </div>
-          
 
-           {/* Change Password Button */}
-        <div className="form-group" style={{ gridColumn: 'span 2' }}>
-          <button
-            type="button"
-            className="btn-change-pwd"
-            onClick={() => {
-              setPwdTargetEmp(editData);
-              setPwdEmail(editData.email || '');
-              setPwdConfirmModal(true);
-            }}
-          >
-            Change Password
-          </button>
-        </div>
+            </div>
+
+
+            {/* Change Password Button */}
+            <div className="form-group-edit" style={{ gridColumn: 'span 2' }}>
+              <button
+                type="button"
+                className="btn-change-pwd"
+                onClick={() => {
+                  setPwdTargetEmp(editData);
+                  setPwdEmail(editData.email || '');
+                  setPwdConfirmModal(true);
+                }}
+              >
+                Change Password
+              </button>
+            </div>
+
 
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setEditModal(false)}>Cancel</button>

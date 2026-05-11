@@ -8,6 +8,10 @@ import { createPortal } from 'react-dom';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useNavigate } from "react-router-dom";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -25,29 +29,19 @@ const AttendanceList = () => {
 
   const now = new Date();
   const [selfiePopup, setSelfiePopup] = useState({ show: false, img: null });
-  // const [showModal, setShowModal] = useState(false);
-  // const [employees, setEmployees] = useState([]);
-  // const [selectedUser, setSelectedUser] = useState('');
-  // const [month, setMonth] = useState(new Date().getMonth() + 1);
-  // const [year, setYear] = useState(new Date().getFullYear());
-  // const [report, setReport] = useState([]);
 
   const [dateFilter, setDateFilter] = useState(now.toISOString().split('T')[0]);
 
-  const handleDate = (e) => {
-    const { value } = e.target;
-    setDateFilter(value);
-  };
+  // ── Export Modal State ──────────────────────────────────────────────────────
+  const [exportModal, setExportModal] = useState(false);
+  const [exportTab, setExportTab] = useState('today');
 
-  // const defaultOptions = {
-  //   loop: true,
-  //   autoplay: true,
-  //   animationData: animationData,
-  //   rendererSettings: {
-  //     preserveAspectRatio: 'xMidYMid slice',
-  //   },
-  // };
-
+  const [exportStartDate, setExportStartDate] = useState(now.toISOString().split('T')[0]);
+  const [exportEndDate, setExportEndDate] = useState(now.toISOString().split('T')[0]);
+  const [exportData, setExportData] = useState([]);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportGenerated, setExportGenerated] = useState(false);
+  // ────────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
 
@@ -104,49 +98,7 @@ const AttendanceList = () => {
       clearTimeout(timeoutId);
     };
 
-  }, [dateFilter, userType]); // ✅ ADD userType HERE
-
-  // ✅ FETCH EMPLOYEE / INTERN LIST
-  // useEffect(() => {
-  //   const fetchEmployees = async () => {
-  //     try {
-  //       const url =
-  //         userType === 'intern'
-  //           ? `${BASE_URL}/employee-List-roles`
-  //           : `${BASE_URL}/employee-List`;
-
-  //       const res = await fetch(url);
-  //       const data = await res.json();
-
-  //       if (data.success) {
-  //         setEmployees(data.data);
-  //       }
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-
-  //   fetchEmployees();
-  // }, [userType]);
-
-  // ✅ FETCH MONTHLY REPORT
-  // const fetchMonthlyReport = async () => {
-  //   if (!selectedUser) return alert("Select Employee");
-
-  //   try {
-  //     const res = await fetch(
-  //       `${BASE_URL}/get-Monthly-Summary?user_id=${selectedUser}&month=${month}&year=${year}`
-  //     );
-
-  //     const data = await res.json();
-
-  //     if (data.success) {
-  //       setReport(data.data.attendance);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
+  }, [dateFilter, userType]);
 
   const getReportTitle = () => {
     switch (userType) {
@@ -163,8 +115,77 @@ const AttendanceList = () => {
     }
   };
 
-  // ✅ DAILY EXPORT
-  const exportDailyReport = () => {
+  // FORMAT TIME
+  const formatTime = (timeString) => {
+    if (!timeString || timeString === '00:00:00') return '--';
+    const parts = timeString.split(':');
+    if (parts.length < 2) return '--';
+    let hour = parseInt(parts[0], 10);
+    let minute = parts[1];
+    if (isNaN(hour) || !minute) return '--';
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  // FORMAT DATE
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const openMonthlyPage = () => {
+    navigate("/admin/monthly-report", { state: { userType } });
+  };
+
+  // FORMAT WORKED HOURS
+  const formatDuration = (timeString) => {
+    if (!timeString || timeString === '00:00:00') return '--';
+    const [hours, minutes] = timeString.split(':').map(Number);
+    if (hours === 0 && minutes === 0) return '--';
+    if (hours === 0) return `${minutes} min`;
+    if (minutes === 0) return `${hours} hr`;
+    return `${hours} hr ${minutes} min`;
+  };
+
+  // ── Fetch date-range data from API ─────────────────────────────────────────
+  const handleGenerateExport = async () => {
+    setExportLoading(true);
+    setExportGenerated(false);
+    try {
+      const res = await fetch(
+        `${BASE_URL}/attendance-List-date?start_date=${exportStartDate}&end_date=${exportEndDate}`
+      );
+      const result = await res.json();
+      if (result.success && result.data) {
+        setExportData(result.data);
+        setExportGenerated(true);
+      } else {
+        setExportData([]);
+        setExportGenerated(true);
+      }
+    } catch (err) {
+      console.error('Export fetch error:', err);
+      setExportData([]);
+      setExportGenerated(true);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  // ── Group records by date ──────────────────────────────────────────────────
+  const groupByDate = (data) => {
+    return data.reduce((acc, item) => {
+      const date = item.attendance_date || 'Unknown';
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(item);
+      return acc;
+    }, {});
+  };
+
+  // ── TODAY: Export as Excel ─────────────────────────────────────────────────
+  const exportTodayExcel = () => {
     const worksheetData = attendanceData.map((item, index) => ({
       "S.No": index + 1,
       "Employee Name": item.name || "-",
@@ -177,19 +198,15 @@ const AttendanceList = () => {
       "Worked Hours": formatDuration(item.worked_hours),
     }));
 
-    // Create worksheet starting from row 5
     const worksheet = XLSX.utils.json_to_sheet(worksheetData, { origin: "A5" });
 
-    // Add Company Name + Report Title + Date
     XLSX.utils.sheet_add_aoa(worksheet, [
       ["MPeoples Business Solutions Pvt Ltd"],
       [getReportTitle()],
-      [`Generated on: ${new Date().toLocaleDateString()}`],
+      [`Date: ${dateFilter}`],
       []
     ], { origin: "A1" });
 
-
-    // Apply styles for header
     ["A1", "A2", "A3"].forEach(cell => {
       if (worksheet[cell]) {
         worksheet[cell].s = {
@@ -198,56 +215,36 @@ const AttendanceList = () => {
         };
       }
     });
-    // Merge rows for clean centered header look
+
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Company Name
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }, // Report Title
-      { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } }  // Date
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
     ];
 
-    // Column widths
     worksheet["!cols"] = [
-      { wch: 6 },   // S.No
-      { wch: 25 },  // Employee Name
-      { wch: 15 },  // Date
-      { wch: 15 },  // Check In
-      { wch: 15 },  // Check Out
-      { wch: 15 },  // Status
-      { wch: 18 },  // Worked Hours
+      { wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
+      { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 18 }
     ];
 
-    // Create workbook
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Report");
-
-    // Export file
-    XLSX.writeFile(
-      workbook,
-      `${getReportTitle().replace(/\s+/g, '_')}_${dateFilter}.xlsx`
-    );
+    XLSX.writeFile(workbook, `${getReportTitle().replace(/\s+/g, '_')}_${dateFilter}.xlsx`);
   };
 
-  const exportDailyPDF = () => {
+  // ── TODAY: Export as PDF ───────────────────────────────────────────────────
+  const exportTodayPDF = () => {
     const doc = new jsPDF();
 
-    // Title
     doc.setFontSize(14);
     doc.text("MPeoples Business Solutions Pvt Ltd", 14, 10);
     doc.setFontSize(12);
     doc.text(getReportTitle(), 14, 18);
     doc.text(`Date: ${dateFilter}`, 14, 25);
 
-    // Table
     const columns = [
-      "S.No",
-      "Employee Name",
-      "Date",
-      "Check In",
-      "Break In",
-      "Break Out",
-      "Check Out",
-      "Status",
-      "Worked Hours"
+      "S.No", "Employee Name", "Date", "Check In",
+      "Break In", "Break Out", "Check Out", "Status", "Worked Hours"
     ];
 
     const rows = attendanceData.map((item, index) => [
@@ -272,105 +269,119 @@ const AttendanceList = () => {
     doc.save(`${getReportTitle().replace(/\s+/g, "_")}_${dateFilter}.pdf`);
   };
 
-  // const exportMonthlyReport = () => {
-  //   const worksheetData = report.map((r, index) => ({
-  //     "S.No": index + 1,
-  //     "Date": r.date || "-",
-  //     "Check In": formatTime(r.check_in),
-  //     "Check Out": formatTime(r.check_out),
-  //     "Status": r.type || "-",
-  //   }));
+  // ── DATE RANGE: Export as Excel (each date = one sheet) ───────────────────
+  const exportRangeExcel = () => {
+    const workbook = XLSX.utils.book_new();
+    const grouped = groupByDate(exportData);
 
-  //   const worksheet = XLSX.utils.json_to_sheet(worksheetData, { origin: "A5" });
+    Object.entries(grouped).forEach(([date, records]) => {
+      const worksheetData = records.map((item, index) => ({
+        "S.No": index + 1,
+        "Employee Name": item.name || "-",
+        "Date": item.attendance_date || "-",
+        "Check In": formatTime(item.check_in),
+        "Break In": formatTime(item.break_in),
+        "Break Out": formatTime(item.break_out),
+        "Check Out": formatTime(item.check_out),
+        "Status": item.type || "-",
+        "Worked Hours": formatDuration(item.worked_hours),
+      }));
 
-  //   // Header
-  //   XLSX.utils.sheet_add_aoa(worksheet, [
-  //     ["MPeoples Business Solutions Pvt Ltd"],
-  //     ["Monthly Attendance Report"],
-  //     [`Generated on: ${new Date().toLocaleDateString()}`],
-  //     []
-  //   ], { origin: "A1" });
+      const worksheet = XLSX.utils.json_to_sheet(worksheetData, { origin: "A5" });
 
-  //   // Merge (center alignment)
-  //   worksheet["!merges"] = [
-  //     { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
-  //     { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
-  //     { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } }
-  //   ];
+      XLSX.utils.sheet_add_aoa(worksheet, [
+        ["MPeoples Business Solutions Pvt Ltd"],
+        [getReportTitle()],
+        [`Date: ${date}`],
+        []
+      ], { origin: "A1" });
 
-  //   // Style (BOLD + CENTER)
-  //   ["A1", "A2", "A3"].forEach(cell => {
-  //     if (worksheet[cell]) {
-  //       worksheet[cell].s = {
-  //         font: { bold: true, sz: cell === "A1" ? 16 : 14 },
-  //         alignment: { horizontal: "center" }
-  //       };
-  //     }
-  //   });
+      ["A1", "A2", "A3"].forEach(cell => {
+        if (worksheet[cell]) {
+          worksheet[cell].s = {
+            font: { bold: true, sz: cell === "A1" ? 16 : 14 },
+            alignment: { horizontal: "center" }
+          };
+        }
+      });
 
-  //   // Column width
-  //   worksheet["!cols"] = [
-  //     { wch: 6 },
-  //     { wch: 15 },
-  //     { wch: 15 },
-  //     { wch: 15 },
-  //     { wch: 15 }
-  //   ];
+      worksheet["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
+      ];
 
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Monthly Report");
+      worksheet["!cols"] = [
+        { wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
+        { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 18 }
+      ];
 
-  //   XLSX.writeFile(workbook, "Monthly_Attendance_Report.xlsx");
-  // };
-
-  // FORMAT TIME
-  const formatTime = (timeString) => {
-    if (!timeString || timeString === '00:00:00') return '--';
-
-    const parts = timeString.split(':');
-
-    if (parts.length < 2) return '--';
-
-    let hour = parseInt(parts[0], 10);
-    let minute = parts[1];
-
-    if (isNaN(hour) || !minute) return '--';
-
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12;
-
-    return `${hour}:${minute} ${ampm}`;
-  };
-
-  // FORMAT DATE
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-
-    const options = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    };
-
-    return new Date(dateString).toLocaleDateString('en-US', options);
-  };
-
-  // GET USER INITIALS
-  // const getInitials = (name) => {
-  //   if (!name) return 'UN';
-  //   return name.substring(0, 2).toUpperCase();
-  // };
-
-  const openMonthlyPage = () => {
-    navigate("/admin/monthly-report", {
-      state: { userType }
+      const sheetName = date.replace(/\//g, '-').substring(0, 31);
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
     });
+
+    XLSX.writeFile(workbook, `Attendance_${exportStartDate}_to_${exportEndDate}.xlsx`);
   };
 
-  // const closeModal = () => {
-  //   setShowModal(false);
-  //   setReport([]);
-  // };
+  // ── DATE RANGE: Export as PDF (each date = one page) ──────────────────────
+  const exportRangePDF = () => {
+    const doc = new jsPDF();
+    const grouped = groupByDate(exportData);
+    const dates = Object.keys(grouped);
+
+    dates.forEach((date, pageIndex) => {
+      if (pageIndex > 0) doc.addPage();
+
+      doc.setFontSize(14);
+      doc.text("MPeoples Business Solutions Pvt Ltd", 14, 10);
+      doc.setFontSize(12);
+      doc.text(getReportTitle(), 14, 18);
+      doc.text(`Date: ${date}`, 14, 25);
+
+      const columns = [
+        "S.No", "Employee Name", "Date", "Check In",
+        "Break In", "Break Out", "Check Out", "Status", "Worked Hours"
+      ];
+
+      const rows = grouped[date].map((item, index) => [
+        index + 1,
+        item.name || "-",
+        item.attendance_date || "-",
+        formatTime(item.check_in),
+        formatTime(item.break_in),
+        formatTime(item.break_out),
+        formatTime(item.check_out),
+        item.type || "-",
+        formatDuration(item.worked_hours)
+      ]);
+
+      autoTable(doc, {
+        startY: 30,
+        head: [columns],
+        body: rows,
+        styles: { fontSize: 8 },
+      });
+    });
+
+    doc.save(`Attendance_${exportStartDate}_to_${exportEndDate}.pdf`);
+  };
+  // ────────────────────────────────────────────────────────────────────────────
+
+  // ── Shared slotProps for DatePickers INSIDE the export modal ─────────────
+  // The modal has zIndex 99999 — the DatePicker popper must be higher
+  const modalPickerSlotProps = (extraTextFieldStyle = {}) => ({
+    textField: {
+      size: 'small',
+      style: { background: '#fff', borderRadius: '8px', ...extraTextFieldStyle },
+    },
+    popper: {
+      style: { zIndex: 999999 },
+    },
+    desktopPaper: {
+      style: { zIndex: 999999 },
+    },
+  });
+  // ─────────────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -381,32 +392,12 @@ const AttendanceList = () => {
     );
   }
 
-  // FORMAT WORKED HOURS
-  const formatDuration = (timeString) => {
-    if (!timeString || timeString === '00:00:00') return '--';
-
-    const [hours, minutes] = timeString.split(':').map(Number);
-
-    if (hours === 0 && minutes === 0) return '--';
-
-    if (hours === 0) {
-      return `${minutes} min`;
-    }
-
-    if (minutes === 0) {
-      return `${hours} hr`;
-    }
-
-    return `${hours} hr ${minutes} min`;
-  };
-
   return (
     <div className="attendance-page fade-in-up">
       {/* HEADER */}
       <div className="page-header glass-panel">
         <div className="header-content">
           <div className="permission-title-group">
-            {/* <Lottie options={defaultOptions} height={70} width={70} /> */}
             <Lottie animationData={animationData} style={{ width: "70px", height: "70px" }} />
             <div>
               <h1>Attendance Records</h1>
@@ -415,13 +406,16 @@ const AttendanceList = () => {
           </div>
 
           <div className="header-actions">
-
-            <button className="primary-btn" onClick={exportDailyPDF}>
-              Daily PDF
-            </button>
-
-            <button className="primary-btn" onClick={exportDailyReport}>
-              Daily Excel
+            <button
+              className="primary-btn"
+              onClick={() => {
+                setExportModal(true);
+                setExportTab('today');
+                setExportGenerated(false);
+                setExportData([]);
+              }}
+            >
+              Export
             </button>
 
             <button className="success-btn" onClick={openMonthlyPage}>
@@ -438,45 +432,48 @@ const AttendanceList = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', width: '100%', gap: '30px', padding: '10px' }}>
+      <div className="date-filter-row">
         <div className="form-group">
           <label>Date Filter</label>
-          <input
-            type="date"
-            name="attendance_date"
-            value={dateFilter}
-            onChange={handleDate}
-            required
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              value={dayjs(dateFilter)}
+              onChange={(newValue) => {
+                if (newValue && newValue.isValid()) {
+                  setDateFilter(newValue.format('YYYY-MM-DD'));
+                }
+              }}
+              format="DD/MM/YYYY"
+              views={['year', 'month', 'day']}
+              openTo="day"
+              slotProps={{
+                textField: {
+                  size: 'small',
+                  style: { background: '#fff', borderRadius: '8px' }
+                }
+              }}
+            />
+          </LocalizationProvider>
         </div>
       </div>
 
       <div className="attendance-toggle">
-
         <button className={userType === 'emp_present' ? 'active-toggle' : ''}
-          onClick={() => {
-            setUserType('emp_present');
-            setLoading(true);
-          }}> Employee Check-in List </button>
-
+          onClick={() => { setUserType('emp_present'); setLoading(true); }}>
+          Employee Check-in List
+        </button>
         <button className={userType === 'intern_present' ? 'active-toggle' : ''}
-          onClick={() => {
-            setUserType('intern_present');
-            setLoading(true);
-          }}> Intern Check-in List </button>
-
+          onClick={() => { setUserType('intern_present'); setLoading(true); }}>
+          Intern Check-in List
+        </button>
         <button className={userType === 'emp_absent' ? 'active-toggle' : ''}
-          onClick={() => {
-            setUserType('emp_absent');
-            setLoading(true);
-          }}> Employee Non Check-in List </button>
-
+          onClick={() => { setUserType('emp_absent'); setLoading(true); }}>
+          Employee Non Check-in List
+        </button>
         <button className={userType === 'intern_absent' ? 'active-toggle' : ''}
-          onClick={() => {
-            setUserType('intern_absent');
-            setLoading(true);
-          }}> Intern Non Check-in List </button>
-
+          onClick={() => { setUserType('intern_absent'); setLoading(true); }}>
+          Intern Non Check-in List
+        </button>
       </div>
 
       {/* TABLE */}
@@ -503,37 +500,26 @@ const AttendanceList = () => {
               {attendanceData.length > 0 ? (
                 attendanceData.map((record, index) => (
                   <tr key={record.id} className="table-row">
-                    {/* EMPLOYEE */}
                     <td>{index + 1}</td>
                     <td>
                       <div className="employee-cell">
-                        {/* <div className="avatar-circle">
-                          {getInitials(record.name)}
-                        </div> */}
-
                         <span className="employee-name">{record.name}</span>
                       </div>
                     </td>
 
-                    {/* DATE */}
                     <td>{formatDate(record.attendance_date)}</td>
 
-                    {/* CHECK IN */}
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="checkin-cell">
                         {record.type !== 'ABSENT' && record.selfie_img ? (
                           <img
                             src={record.selfie_img}
                             alt="selfie"
                             onClick={() => setSelfiePopup({ show: true, img: record.selfie_img })}
-                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid #2563eb', cursor: 'pointer' }}
+                            className="selfie-thumb selfie-thumb--checkin"
                           />
                         ) : (
-                          <div style={{
-                            width: 32, height: 32, borderRadius: '50%', background: '#dbeafe',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 700, fontSize: 13, color: '#2563eb'
-                          }}>
+                          <div className="selfie-avatar selfie-avatar--checkin">
                             {record.name?.charAt(0).toUpperCase() || '?'}
                           </div>
                         )}
@@ -543,30 +529,20 @@ const AttendanceList = () => {
                       </div>
                     </td>
 
-                    <td>
-                      {record.type === 'ABSENT' ? '--' : formatTime(record.break_in)}
-                    </td>
+                    <td>{record.type === 'ABSENT' ? '--' : formatTime(record.break_in)}</td>
+                    <td>{record.type === 'ABSENT' ? '--' : formatTime(record.break_out)}</td>
 
                     <td>
-                      {record.type === 'ABSENT' ? '--' : formatTime(record.break_out)}
-                    </td>
-
-                    {/* CHECK OUT */}
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="checkin-cell">
                         {record.type !== 'ABSENT' && record.checkout_selfie_img ? (
                           <img
                             src={record.checkout_selfie_img}
                             alt="checkout selfie"
                             onClick={() => setSelfiePopup({ show: true, img: record.checkout_selfie_img })}
-                            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid #16a34a', cursor: 'pointer' }}
+                            className="selfie-thumb selfie-thumb--checkout"
                           />
                         ) : (
-                          <div style={{
-                            width: 32, height: 32, borderRadius: '50%', background: '#dcfce7',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 700, fontSize: 13, color: '#16a34a'
-                          }}>
+                          <div className="selfie-avatar selfie-avatar--checkout">
                             {record.name?.charAt(0).toUpperCase() || '?'}
                           </div>
                         )}
@@ -576,23 +552,22 @@ const AttendanceList = () => {
                       </div>
                     </td>
 
-                    {/* STATUS */}
                     <td>
                       <div className="status-flex">
                         <span
                           className={`status-pill ${record.type === 'PRESENT'
-                              ? 'present'
-                              : record.type === 'ABSENT'
-                                ? 'absent'
-                                : record.type === 'ONDUTY'
-                                  ? 'onduty'
-                                  : ['LOP', 'SICK', 'CASUAL', 'LEAVE'].includes(record.type)
-                                    ? 'leave'
-                                    : ['L-H', 'C-H', 'W-H'].includes(record.type)
-                                      ? 'holiday'
-                                      : record.type === 'HALFDAY'
-                                        ? 'halfday'
-                                        : ''
+                            ? 'present'
+                            : record.type === 'ABSENT'
+                              ? 'absent'
+                              : record.type === 'ONDUTY'
+                                ? 'onduty'
+                                : ['LOP', 'SICK', 'CASUAL', 'LEAVE'].includes(record.type)
+                                  ? 'leave'
+                                  : ['L-H', 'C-H', 'W-H'].includes(record.type)
+                                    ? 'holiday'
+                                    : record.type === 'HALFDAY'
+                                      ? 'halfday'
+                                      : ''
                             }`}
                         >
                           {{
@@ -611,33 +586,23 @@ const AttendanceList = () => {
                         </span>
 
                         {record.late_checkin === 1 && (
-                          <span
-                            className="late-indicator"
-                            title={`Late by ${record.late_checkin_time}`}
-                          >
+                          <span className="late-indicator" title={`Late by ${record.late_checkin_time}`}>
                             Late
                           </span>
                         )}
                       </div>
                     </td>
+
                     <td>
-                      {record.late_checkin === 1
-                        ? formatDuration(record.late_checkin_time)
-                        : '--'}
+                      {record.late_checkin === 1 ? formatDuration(record.late_checkin_time) : '--'}
                     </td>
 
-                    {/* WORKED HOURS */}
                     <td>
-                      <span className="hours-text">
-                        {formatDuration(record.worked_hours)}
-                      </span>
+                      <span className="hours-text">{formatDuration(record.worked_hours)}</span>
                     </td>
 
-                    {/* SHORTFALL / OVERTIME */}
                     <td>
-                      <span className="hours-text">
-                        {formatDuration(record.overtimed_hours)}
-                      </span>
+                      <span className="hours-text">{formatDuration(record.overtimed_hours)}</span>
                     </td>
                   </tr>
                 ))
@@ -650,94 +615,213 @@ const AttendanceList = () => {
               )}
             </tbody>
           </table>
-
-
         </div>
       </div>
-      {/* {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
 
-            <h2>Monthly Report</h2>
-
-            <select
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-            >
-              <option value="">Select Employee</option>
-              {employees.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name}
-                </option>
-              ))}
-            </select>
-
-            <input type="number" value={month} onChange={(e) => setMonth(e.target.value)} />
-            <input type="number" value={year} onChange={(e) => setYear(e.target.value)} />
-
-            <button onClick={fetchMonthlyReport}>Get Report</button>
-            <button onClick={exportMonthlyReport}>Export Excel</button>
-            <button onClick={closeModal}>Close</button>
-            <div className="modal-table">
-              {report.length === 0 ? (
-                <p style={{ marginTop: "10px" }}>No data available</p>
-              ) : (
-                <table className="elegant-table" style={{ marginTop: "10px" }}>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Check In</th>
-                      <th>Check Out</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {report.map((r, i) => (
-                      <tr key={i}>
-                        <td>{formatDate(r.date)}</td>
-                        <td>{formatTime(r.check_in)}</td>
-                        <td>{formatTime(r.check_out)}</td>
-                        <td>{r.type}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )} */}
+      {/* SELFIE POPUP */}
       {selfiePopup.show && createPortal(
         <div
           onClick={() => setSelfiePopup({ show: false, img: null })}
-          style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(0,0,0,0.6)',
-          }}
+          className="selfie-overlay"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{
-              background: '#fff', borderRadius: '14px', padding: '16px',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-            }}
+            className="selfie-modal"
           >
             <img
               src={selfiePopup.img}
               alt="selfie preview"
-              style={{ width: 300, height: 300, objectFit: 'cover', borderRadius: '10px', display: 'block' }}
+              className="selfie-modal__img"
             />
             <button
               onClick={() => setSelfiePopup({ show: false, img: null })}
-              style={{
-                width: '100%', padding: '8px 0', borderRadius: '8px', border: 'none',
-                background: '#1e293b', color: '#fff', fontWeight: 600,
-                fontSize: 14, cursor: 'pointer',
-              }}
+              className="selfie-modal__close"
+            >
+              Close
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ── EXPORT MODAL ── */}
+      {exportModal && createPortal(
+        <div
+          onClick={() => setExportModal(false)}
+          className="export-overlay"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="export-modal"
+          >
+            {/* Modal Header */}
+            <div className="export-modal__header">
+              <h2 className="export-modal__title">Export Attendance Report</h2>
+              <p className="export-modal__subtitle">
+                Choose the report type and download format.
+              </p>
+            </div>
+
+            {/* Tab Switcher */}
+            <div className="export-tab-switcher">
+              <button
+                onClick={() => setExportTab('today')}
+                className={`export-tab-btn${exportTab === 'today' ? ' export-tab-btn--active' : ''}`}
+              >
+                Today List
+              </button>
+              <button
+                onClick={() => {
+                  setExportTab('range');
+                  setExportGenerated(false);
+                  setExportData([]);
+                }}
+                className={`export-tab-btn${exportTab === 'range' ? ' export-tab-btn--active' : ''}`}
+              >
+                Date Range
+              </button>
+            </div>
+
+            {/* TODAY LIST TAB */}
+            {exportTab === 'today' && (
+              <div className="export-tab-content">
+                <div className="export-today-info">
+                  <span className="export-today-icon"></span>
+                  <div className="export-today-body">
+                    <p className="export-today-title">{getReportTitle()}</p>
+                    <div className="export-today-datepicker">
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          value={dayjs(dateFilter)}
+                          onChange={(newValue) => {
+                            if (newValue && newValue.isValid()) {
+                              setDateFilter(newValue.format('YYYY-MM-DD'));
+                            }
+                          }}
+                          format="DD/MM/YYYY"
+                          views={['year', 'month', 'day']}
+                          openTo="day"
+                          slotProps={modalPickerSlotProps({ width: '160px' })}
+                        />
+                      </LocalizationProvider>
+                      <span className="export-record-count">
+                        {attendanceData.length} record(s)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {attendanceData.length === 0 ? (
+                  <p className="export-empty-msg">
+                    No records found for the selected date.
+                  </p>
+                ) : (
+                  <div className="export-btn-row">
+                    <button
+                      onClick={() => { exportTodayExcel(); setExportModal(false); }}
+                      className="export-dl-btn export-dl-btn--excel"
+                    >
+                      <span>⬇</span> Export Excel
+                    </button>
+                    <button
+                      onClick={() => { exportTodayPDF(); setExportModal(false); }}
+                      className="export-dl-btn export-dl-btn--pdf"
+                    >
+                      <span>⬇</span> Export PDF
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* DATE RANGE TAB */}
+            {exportTab === 'range' && (
+              <div className="export-tab-content">
+                <div className="export-range-pickers">
+                  <div className="export-picker-group">
+                    <label className="export-picker-label">Start Date</label>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        value={dayjs(exportStartDate)}
+                        onChange={(newValue) => {
+                          if (newValue && newValue.isValid()) {
+                            setExportStartDate(newValue.format('YYYY-MM-DD'));
+                            setExportGenerated(false);
+                          }
+                        }}
+                        format="DD/MM/YYYY"
+                        views={['year', 'month', 'day']}
+                        openTo="day"
+                        slotProps={modalPickerSlotProps({ width: '100%' })}
+                      />
+                    </LocalizationProvider>
+                  </div>
+
+                  <div className="export-picker-group">
+                    <label className="export-picker-label">End Date</label>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        value={dayjs(exportEndDate)}
+                        onChange={(newValue) => {
+                          if (newValue && newValue.isValid()) {
+                            setExportEndDate(newValue.format('YYYY-MM-DD'));
+                            setExportGenerated(false);
+                          }
+                        }}
+                        format="DD/MM/YYYY"
+                        views={['year', 'month', 'day']}
+                        openTo="day"
+                        slotProps={modalPickerSlotProps({ width: '100%' })}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleGenerateExport}
+                  disabled={exportLoading}
+                  className={`export-generate-btn${exportLoading ? ' export-generate-btn--loading' : ''}`}
+                >
+                  {exportLoading ? 'Fetching data...' : 'Generate'}
+                </button>
+
+                {exportGenerated && (
+                  <div className="export-generated-section">
+                    {exportData.length === 0 ? (
+                      <p className="export-empty-msg">
+                        No records found for the selected date range.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="export-range-summary">
+                          {exportData.length} record(s) found across {Object.keys(groupByDate(exportData)).length} date(s).
+                          Each date will be a separate page / sheet.
+                        </p>
+                        <div className="export-btn-row">
+                          <button
+                            onClick={exportRangeExcel}
+                            className="export-dl-btn export-dl-btn--excel"
+                          >
+                            <span>⬇</span> Export Excel
+                          </button>
+                          <button
+                            onClick={exportRangePDF}
+                            className="export-dl-btn export-dl-btn--pdf"
+                          >
+                            <span>⬇</span> Export PDF
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Close */}
+            <button
+              onClick={() => setExportModal(false)}
+              className="export-modal__close-btn"
             >
               Close
             </button>

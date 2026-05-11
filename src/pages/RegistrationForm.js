@@ -28,6 +28,7 @@ const RegistrationForm = () => {
     qualification: '',
     joining_date: '',
     experience: '',
+    salary: '',
   });
 
   const [companies, setCompanies] = useState([]);
@@ -222,6 +223,7 @@ const RegistrationForm = () => {
           qualification: '',
           joining_date: '',
           experience: '',
+          salary: '',
         });
       } else {
         if (result.errors) {
@@ -242,339 +244,350 @@ const RegistrationForm = () => {
 
   return (
     <>
-    <AdminHeader />
-    <div className="form-container">
-      <div className="form-card">
-        <h2 className="form-title">Employee Registration</h2>
+      <AdminHeader />
+      <div className="form-container">
+        <div className="form-card">
+          <h2 className="form-title">Employee Registration</h2>
 
-        <form onSubmit={handleSubmit} className="registration-form">
-          {/* NAME */}
+          <form onSubmit={handleSubmit} className="registration-form">
+            {/* NAME */}
 
-          <div className="form-groups">
-            <label>Full Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* EMPID */}
+            {/* EMPID */}
 
-          <div className="form-groups">
-            <label>Employee ID</label>
-            <input
-              type="text"
-              name="empid"
-              value={formData.empid}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Employee ID</label>
+              <input
+                type="text"
+                name="empid"
+                value={formData.empid}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* EMAIL */}
+            {/* EMAIL */}
 
-          <div className="form-groups">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* MOBILE */}
+            {/* MOBILE */}
 
-          <div className="form-groups">
-            <label>Mobile</label>
-            <input
-              type="text"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              pattern="\d{10}"
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Mobile</label>
+              <input
+                type="text"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                pattern="\d{10}"
+                required
+              />
+            </div>
 
-          <div className="form-groups">
-            <label>Date of Birth</label>
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Date of Birth</label>
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* PASSWORD */}
+            {/* PASSWORD */}
 
-          <div className="form-groups">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* CONFIRM PASSWORD */}
+            {/* CONFIRM PASSWORD */}
 
-          <div className="form-groups">
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              name="c_password"
-              value={formData.c_password}
-              onChange={handleChange}
-              required
-            />
+            <div className="form-groups">
+              <label>Confirm Password</label>
+              <input
+                type="password"
+                name="c_password"
+                value={formData.c_password}
+                onChange={handleChange}
+                required
+              />
 
-            {passwordError && (
-              <span className="error-text">{passwordError}</span>
-            )}
-          </div>
+              {passwordError && (
+                <span className="error-text">{passwordError}</span>
+              )}
+            </div>
 
-          {/* POSITION */}
+            {/* POSITION */}
 
-          <div className="form-groups">
-            <label>Position</label>
-            <input
-              type="text"
-              name="position"
-              value={formData.position}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Position</label>
+              <input
+                type="text"
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* ROLE */}
+            {/* ROLE */}
 
-          <div className="form-groups">
-            <label>Role</label>
+            <div className="form-groups">
+              <label>Role</label>
 
-            <select
-              name="role_id"
-              value={formData.role_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">
-                {loadingRoles ? 'Loading...' : 'Select Role'}
-              </option>
-
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
+              <select
+                name="role_id"
+                value={formData.role_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">
+                  {loadingRoles ? 'Loading...' : 'Select Role'}
                 </option>
-              ))}
-            </select>
-          </div>
 
-          {/* COMPANY */}
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="form-groups">
-            <label>Company</label>
+            {/* COMPANY */}
 
-            <select
-              name="company_id"
-              value={formData.company_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">
-                {loadingCompanies ? 'Loading...' : 'Select Company'}
-              </option>
+            <div className="form-groups">
+              <label>Company</label>
 
-              {companies.map((comp) => (
-                <option key={comp.id} value={comp.id}>
-                  {comp.name}
+              <select
+                name="company_id"
+                value={formData.company_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">
+                  {loadingCompanies ? 'Loading...' : 'Select Company'}
                 </option>
-              ))}
-            </select>
-          </div>
 
-          {/* BRANCH */}
+                {companies.map((comp) => (
+                  <option key={comp.id} value={comp.id}>
+                    {comp.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="form-groups">
-            <label>Branch</label>
+            {/* BRANCH */}
 
-            <select
-              name="branch_id"
-              value={formData.branch_id}
-              onChange={handleChange}
-              disabled={!formData.company_id}
-              required
-            >
-              <option value="">
-                {loadingBranches ? 'Loading...' : 'Select Branch'}
-              </option>
+            <div className="form-groups">
+              <label>Branch</label>
 
-              {branches.map((branch) => (
-                <option key={branch.id} value={branch.id}>
-                  {branch.name}
+              <select
+                name="branch_id"
+                value={formData.branch_id}
+                onChange={handleChange}
+                disabled={!formData.company_id}
+                required
+              >
+                <option value="">
+                  {loadingBranches ? 'Loading...' : 'Select Branch'}
                 </option>
-              ))}
-            </select>
-          </div>
+
+                {branches.map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
 
-          <div className="form-groups">
-            <label>Designation</label>
+            <div className="form-groups">
+              <label>Designation</label>
 
-            <select
-              name="designation"
-              value={formData.designation}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Designation</option>
-              <option value="TL">Team Lead</option>
-              <option value="TM">Team Member</option>
-            </select>
-          </div>
+              <select
+                name="designation"
+                value={formData.designation}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Designation</option>
+                <option value="TL">Team Lead</option>
+                <option value="TM">Team Member</option>
+              </select>
+            </div>
 
-          <div className="form-groups">
-            <label>Team</label>
+            <div className="form-groups">
+              <label>Team</label>
 
-            <select
-              name="team_id"
-              value={formData.team_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">
-                {loadingTeams ? 'Loading...' : 'Select Team'}
-              </option>
-
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
+              <select
+                name="team_id"
+                value={formData.team_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">
+                  {loadingTeams ? 'Loading...' : 'Select Team'}
                 </option>
-              ))}
-            </select>
-          </div>
 
-          <div className="form-groups">
-            <label>Employee Status</label>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              name="employee_status"
-              value={formData.employee_status}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Status</option>
-              <option value="working">Working</option>
-              <option value="notice_period">Notice Period</option>
-              <option value="relieved">Relieved</option>
-            </select>
-          </div>
+            <div className="form-groups">
+              <label>Employee Status</label>
 
-          <div className="form-groups">
-            <label>Qualification</label>
-            <input
-              type="text"
-              name="qualification"
-              value={formData.qualification}
-              onChange={handleChange}
-            />
-          </div>
+              <select
+                name="employee_status"
+                value={formData.employee_status}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Status</option>
+                <option value="working">Working</option>
+                <option value="notice_period">Notice Period</option>
+                <option value="relieved">Relieved</option>
+              </select>
+            </div>
 
-          <div className="form-groups">
-            <label>Joining Date</label>
-            <input
-              type="date"
-              name="joining_date"
-              value={formData.joining_date}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="form-groups">
+              <label>Salary</label>
+              <input
+                type="number"
+                name="salary"
+                value={formData.salary}
+                onChange={handleChange}
+                placeholder="Enter Salary"
+              />
+            </div>
 
-          <div className="form-groups">
-            <label>Experience</label>
-            <input
-              type="text"
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="form-groups">
+              <label>Qualification</label>
+              <input
+                type="text"
+                name="qualification"
+                value={formData.qualification}
+                onChange={handleChange}
+              />
+            </div>
 
-          {/* START TIME */}
+            <div className="form-groups">
+              <label>Joining Date</label>
+              <input
+                type="date"
+                name="joining_date"
+                value={formData.joining_date}
+                onChange={handleChange}
+              />
+            </div>
 
-          <div className="form-groups">
-            <label>Start Time</label>
-            <input
-              type="time"
-              step="1"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Experience</label>
+              <input
+                type="text"
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+              />
+            </div>
 
-          {/* END TIME */}
+            {/* START TIME */}
 
-          <div className="form-groups">
-            <label>End Time</label>
-            <input
-              type="time"
-              step="1"
-              name="end_time"
-              value={formData.end_time}
-              min={formData.start_time}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-groups">
+              <label>Start Time</label>
+              <input
+                type="time"
+                step="1"
+                name="start_time"
+                value={formData.start_time}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          {/* ADDRESS */}
+            {/* END TIME */}
 
-          <div className="form-groups full-width">
-            <label>Address</label>
+            <div className="form-groups">
+              <label>End Time</label>
+              <input
+                type="time"
+                step="1"
+                name="end_time"
+                value={formData.end_time}
+                min={formData.start_time}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              required
-            ></textarea>
-          </div>
+            {/* ADDRESS */}
 
-          {/* PROFILE IMAGE */}
+            <div className="form-groups full-width">
+              <label>Address</label>
 
-          <div className="form-groups full-width">
-            <label>Profile Image</label>
+              <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                rows="3"
+                required
+              ></textarea>
+            </div>
 
-            <input
-              type="file"
-              name="profileimg"
-              accept="image/*"
-              onChange={handleChange}
-            />
-          </div>
+            {/* PROFILE IMAGE */}
 
-          {/* SUBMIT */}
+            <div className="form-groups full-width">
+              <label>Profile Image</label>
 
-          <div className="form-actions full-width">
-            <button type="submit" className="submit-btn">
-              {' '}
-              Register Employee{' '}
-            </button>
-          </div>
-        </form>
+              <input
+                type="file"
+                name="profileimg"
+                accept="image/*"
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* SUBMIT */}
+
+            <div className="form-actions full-width">
+              <button type="submit" className="submit-btn">
+                {' '}
+                Register Employee{' '}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };

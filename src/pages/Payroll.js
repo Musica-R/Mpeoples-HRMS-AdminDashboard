@@ -630,7 +630,7 @@ function MonthlyPayroll({ employees }) {
               </tbody>
               <tfoot>
                 <tr>
-                  <td className="pay-td pay-tfoot-label" colSpan={12}>Total Payable</td>
+                  <td className="pay-td pay-tfoot-label" colSpan={13}>Total Payable</td>
                   <td className="pay-td pay-td--final pay-td--r">
                     ₹ {list.reduce((s, e) => s + (e.final_salary || 0), 0).toLocaleString()}
                   </td>

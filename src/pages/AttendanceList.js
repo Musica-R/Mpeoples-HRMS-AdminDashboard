@@ -193,6 +193,7 @@ const AttendanceList = () => {
       "Check In": formatTime(item.check_in),
       "Break In": formatTime(item.break_in),
       "Break Out": formatTime(item.break_out),
+      "Total Break": `${item.total_break_minutes || 0} min`,
       "Check Out": formatTime(item.check_out),
       "Status": item.type || "-",
       "Worked Hours": formatDuration(item.worked_hours),
@@ -217,14 +218,22 @@ const AttendanceList = () => {
     });
 
     worksheet["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
-      { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } }
     ];
 
     worksheet["!cols"] = [
-      { wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
-      { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 18 }
+      { wch: 6 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 18 }
     ];
 
     const workbook = XLSX.utils.book_new();
@@ -243,8 +252,16 @@ const AttendanceList = () => {
     doc.text(`Date: ${dateFilter}`, 14, 25);
 
     const columns = [
-      "S.No", "Employee Name", "Date", "Check In",
-      "Break In", "Break Out", "Check Out", "Status", "Worked Hours"
+      "S.No",
+      "Employee Name",
+      "Date",
+      "Check In",
+      "Break In",
+      "Break Out",
+      "Total Break",
+      "Check Out",
+      "Status",
+      "Worked Hours"
     ];
 
     const rows = attendanceData.map((item, index) => [
@@ -254,6 +271,7 @@ const AttendanceList = () => {
       formatTime(item.check_in),
       formatTime(item.break_in),
       formatTime(item.break_out),
+      `${item.total_break_minutes || 0} min`,
       formatTime(item.check_out),
       item.type || "-",
       formatDuration(item.worked_hours)
@@ -282,6 +300,7 @@ const AttendanceList = () => {
         "Check In": formatTime(item.check_in),
         "Break In": formatTime(item.break_in),
         "Break Out": formatTime(item.break_out),
+        "Total Break": `${item.total_break_minutes || 0} min`,
         "Check Out": formatTime(item.check_out),
         "Status": item.type || "-",
         "Worked Hours": formatDuration(item.worked_hours),
@@ -306,14 +325,22 @@ const AttendanceList = () => {
       });
 
       worksheet["!merges"] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } }
       ];
 
       worksheet["!cols"] = [
-        { wch: 6 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
-        { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 18 }
+        { wch: 6 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 18 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 18 }
       ];
 
       const sheetName = date.replace(/\//g, '-').substring(0, 31);
@@ -339,10 +366,17 @@ const AttendanceList = () => {
       doc.text(`Date: ${date}`, 14, 25);
 
       const columns = [
-        "S.No", "Employee Name", "Date", "Check In",
-        "Break In", "Break Out", "Check Out", "Status", "Worked Hours"
+        "S.No",
+        "Employee Name",
+        "Date",
+        "Check In",
+        "Break In",
+        "Break Out",
+        "Total Break",
+        "Check Out",
+        "Status",
+        "Worked Hours"
       ];
-
       const rows = grouped[date].map((item, index) => [
         index + 1,
         item.name || "-",
@@ -350,6 +384,7 @@ const AttendanceList = () => {
         formatTime(item.check_in),
         formatTime(item.break_in),
         formatTime(item.break_out),
+        `${item.total_break_minutes || 0} min`,
         formatTime(item.check_out),
         item.type || "-",
         formatDuration(item.worked_hours)
@@ -425,7 +460,7 @@ const AttendanceList = () => {
 
           <div className="header-actions">
             <div className="stat-badge">
-              <span className="badge-label">CHECK-INS TODAY</span>
+              <span className="badge-label">Today's List Count</span>
               <span className="badge-value">{attendanceData.length}</span>
             </div>
           </div>
@@ -488,6 +523,7 @@ const AttendanceList = () => {
                 <th>Check In</th>
                 <th>Break In</th>
                 <th>Break Out</th>
+                <th>Total Break</th>
                 <th>Check Out</th>
                 <th>Status</th>
                 <th>Late By</th>
@@ -531,6 +567,11 @@ const AttendanceList = () => {
 
                     <td>{record.type === 'ABSENT' ? '--' : formatTime(record.break_in)}</td>
                     <td>{record.type === 'ABSENT' ? '--' : formatTime(record.break_out)}</td>
+                    <td>
+                      {record.type === 'ABSENT'
+                        ? '--'
+                        : `${record.total_break_minutes || 0} min`}
+                    </td>
 
                     <td>
                       <div className="checkin-cell">

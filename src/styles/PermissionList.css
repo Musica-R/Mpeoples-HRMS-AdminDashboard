@@ -369,7 +369,6 @@
 
 /* ======================== CELL STYLES ======================== */
 
-/* S.No */
 .pl-table td:first-child {
   color: #b0bec5;
   font-size: 12px;
@@ -377,7 +376,6 @@
   width: 40px;
 }
 
-/* Permission ID badge */
 .pl-id-badge {
   display: inline-flex;
   align-items: center;
@@ -392,7 +390,6 @@
   letter-spacing: 0.2px;
 }
 
-/* Name */
 .pl-name-cell {
   font-weight: 700;
   color: #1e293b;
@@ -400,7 +397,6 @@
   white-space: nowrap;
 }
 
-/* Time badge */
 .pl-time-badge {
   display: inline-flex;
   align-items: center;
@@ -414,7 +410,6 @@
   border: 1px solid #dde3fb;
 }
 
-/* Duration */
 .pl-hours {
   font-weight: 700;
   color: #1e293b;
@@ -427,7 +422,7 @@
   display: inline-block;
 }
 
-/* ======================== REASON — FULL CONTENT ======================== */
+/* ======================== REASON CELL ======================== */
 .pl-reason-cell {
   min-width: 200px;
   max-width: 280px;
@@ -439,7 +434,106 @@
   line-height: 1.6;
   white-space: normal;
   word-break: break-word;
-  /* NO line-clamp, NO overflow hidden, NO text-overflow ellipsis */
+}
+
+/* ── Read more button ── */
+.pl-read-more-btn {
+  display: inline;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.pl-read-more-btn:hover {
+  color: #3730a3;
+}
+
+/* ======================== REASON MODAL ======================== */
+.pl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: pl-fade-in 0.18s ease;
+}
+
+@keyframes pl-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pl-modal-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  animation: pl-slide-up 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pl-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.pl-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
+}
+
+.pl-modal-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #4f46e5;
+  letter-spacing: -0.2px;
+}
+
+.pl-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pl-modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.pl-modal-body {
+  padding: 22px;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* ======================== STATUS BADGE ======================== */
@@ -507,6 +601,7 @@
   .pl-card-num { font-size: 26px; }
   .pl-table-container { overflow-x: auto; }
   .pl-table { min-width: 700px; }
+  .pl-modal-box { max-width: 100%; border-radius: 14px; }
 }
 
 /* ======================== 420px ======================== */
@@ -526,4 +621,5 @@
   .pl-table { min-width: 650px; }
   .pl-error { flex-direction: column; align-items: flex-start; gap: 10px; }
   .pl-retry-btn { margin-left: 0; }
+  .pl-modal-body { padding: 16px; font-size: 13px; }
 }

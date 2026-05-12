@@ -77,13 +77,13 @@ const DashboardHome = () => {
         return name.substring(0, 2).toUpperCase();
     };
 
-    const formatTime = (timeString) => {
-        if (!timeString) return 'N/A';
-        const [hour, minute] = timeString.split(':');
-        const h = parseInt(hour, 10);
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        return `${h % 12 || 12}:${minute} ${ampm}`;
-    };
+    // const formatTime = (timeString) => {
+    //     if (!timeString) return 'N/A';
+    //     const [hour, minute] = timeString.split(':');
+    //     const h = parseInt(hour, 10);
+    //     const ampm = h >= 12 ? 'PM' : 'AM';
+    //     return `${h % 12 || 12}:${minute} ${ampm}`;
+    // };
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -129,14 +129,14 @@ const DashboardHome = () => {
                                 <div className="profile-role">{adminData.position || adminData.role || 'Staff Member'}</div>
                                 <div className="profile-meta">
                                     <span className="meta-item"><i className="icon-id"></i> {adminData.empid || 'No ID assigned'}</span>
-                                    {(adminData.start_time || adminData.end_time) && (
+                                    {/* {(adminData.start_time || adminData.end_time) && (
                                         <span className="meta-item">
                                             <i className="icon-time"></i>
                                             {adminData.start_time ? formatTime(adminData.start_time) : ''}
                                             {adminData.start_time && adminData.end_time ? ' - ' : ''}
                                             {adminData.end_time ? formatTime(adminData.end_time) : ''}
                                         </span>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
                         </div>

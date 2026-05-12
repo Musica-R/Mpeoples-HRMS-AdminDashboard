@@ -8,6 +8,7 @@ import {
   FiRefreshCw,
   FiAlertCircle,
   FiSearch,
+  FiX,
 } from 'react-icons/fi';
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -34,7 +35,6 @@ function formatDate(dateStr) {
   });
 }
 
-/* Map leave type → chip class */
 function leaveTypeClass(type) {
   if (!type) return 'default';
   const t = type.toUpperCase();
@@ -45,6 +45,42 @@ function leaveTypeClass(type) {
   return 'default';
 }
 
+/* ── Reason cell: show first 15 words, "Read more" for the rest ── */
+function ReasonCell({ text, onReadMore }) {
+  if (!text) return <span>—</span>;
+  const words = text.trim().split(/\s+/);
+  if (words.length <= 10) {
+    return <div className="ll-reason-text">{text}</div>;
+  }
+  const preview = words.slice(0, 10).join(' ');
+  return (
+    <div className="ll-reason-text">
+      {preview}…{' '}
+      <button className="ll-read-more-btn" onClick={() => onReadMore(text)}>
+        Read more
+      </button>
+    </div>
+  );
+}
+
+/* ── Modal ── */
+function ReasonModal({ text, onClose }) {
+  if (!text) return null;
+  return (
+    <div className="ll-modal-overlay" onClick={onClose}>
+      <div className="ll-modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="ll-modal-header">
+          <span className="ll-modal-title">Leave Reason</span>
+          <button className="ll-modal-close" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+        <div className="ll-modal-body">{text}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function LeaveList() {
   const [leaves, setLeaves] = useState([]);
   const [meta, setMeta] = useState({ month: '', total: 0 });
@@ -53,6 +89,7 @@ export default function LeaveList() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [modalText, setModalText] = useState(null);
 
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1);
@@ -169,6 +206,9 @@ export default function LeaveList() {
 
   return (
     <div className="leavelist-page">
+      {/* ── REASON MODAL ── */}
+      <ReasonModal text={modalText} onClose={() => setModalText(null)} />
+
       {/* ── HEADER ── */}
       <div className="leavelist-header">
         <div className="leavelist-title">
@@ -339,18 +379,19 @@ export default function LeaveList() {
                         {/* Leave Date */}
                         <td className="ll-date">{formatDate(leave.leave_date)}</td>
 
-                        {/* Leave Type — coloured chip */}
+                        {/* Leave Type */}
                         <td className="ll-type">
                           <span className={`ll-type-chip ${leaveTypeClass(leave.leave_type)}`}>
                             {leave.leave_type || '—'}
                           </span>
                         </td>
 
-                        {/* Reason — full content, no clamp */}
+                        {/* Reason — 15-word preview + Read more */}
                         <td className="ll-reason-cell">
-                          <div className="ll-reason-text">
-                            {leave.reason || '—'}
-                          </div>
+                          <ReasonCell
+                            text={leave.reason}
+                            onReadMore={(t) => setModalText(t)}
+                          />
                         </td>
 
                         {/* Applied On */}
@@ -394,7 +435,6 @@ export default function LeaveList() {
                         </td>
 
                         {/* Approved By */}
-
                         <td style={{ whiteSpace: 'nowrap' }}>
                           <span
                             style={{
@@ -410,20 +450,11 @@ export default function LeaveList() {
                           >
                             {leave.approved_position || '—'}
                           </span>
-
                           <br />
-
-                          <span
-                            style={{
-                              fontSize: '10px',
-                              color: '#94a3b8',
-                              fontWeight: 400,
-                            }}
-                          >
+                          <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 400 }}>
                             {/* {leave.approved_by || '—'} */}
                           </span>
                         </td>
-
                       </tr>
                     );
                   })}

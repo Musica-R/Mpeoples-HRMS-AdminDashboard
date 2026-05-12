@@ -193,7 +193,7 @@ function PayslipModal({ slip, employee, onClose, logoSrc }) {
                 {logoSrc && <img src={logoSrc} alt="Logo" className="ps-logo" crossOrigin="anonymous" />}
                 <div>
                   <div className="ps-company-name">MPeoples Business Solutions Pvt Ltd</div>
-                  <div className="ps-company-addr">Salem, Tamil Nadu, India · mpdatahub.com</div>
+                  <div className="ps-company-addr">Salem, Tamil Nadu, India</div>
                 </div>
               </div>
               <div className="ps-title-block">

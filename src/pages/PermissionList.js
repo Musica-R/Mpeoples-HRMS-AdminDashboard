@@ -7,6 +7,7 @@ import {
   FiRefreshCw,
   FiAlertCircle,
   FiSearch,
+  FiX,
 } from 'react-icons/fi';
 import Lottie from "lottie-react";
 import animationData from '../LottieFiles/Allow Permission.json';
@@ -27,6 +28,42 @@ const STATUS_CONFIG = {
   },
 };
 
+/* ── Reason cell: show first 15 words, "Read more" for the rest ── */
+function ReasonCell({ text, onReadMore }) {
+  if (!text) return <span>—</span>;
+  const words = text.trim().split(/\s+/);
+  if (words.length <= 10) {
+    return <div className="pl-reason-text">{text}</div>;
+  }
+  const preview = words.slice(0, 10).join(' ');
+  return (
+    <div className="pl-reason-text">
+      {preview}…{' '}
+      <button className="pl-read-more-btn" onClick={() => onReadMore(text)}>
+        Read more
+      </button>
+    </div>
+  );
+}
+
+/* ── Modal ── */
+function ReasonModal({ text, onClose }) {
+  if (!text) return null;
+  return (
+    <div className="pl-modal-overlay" onClick={onClose}>
+      <div className="pl-modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="pl-modal-header">
+          <span className="pl-modal-title">Permission Reason</span>
+          <button className="pl-modal-close" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+        <div className="pl-modal-body">{text}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function PermissionList() {
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +71,7 @@ export default function PermissionList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [updatingId, setUpdatingId] = useState(null);
+  const [modalText, setModalText] = useState(null);
 
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1);
@@ -162,6 +200,9 @@ export default function PermissionList() {
 
   return (
     <div className="permission-page fade-in">
+
+      {/* ── REASON MODAL ── */}
+      <ReasonModal text={modalText} onClose={() => setModalText(null)} />
 
       {/* ── HEADER ── */}
       <div className="permission-header">
@@ -327,11 +368,12 @@ export default function PermissionList() {
                         </span>
                       </td>
 
-                      {/* Reason — full content, no clamp */}
+                      {/* Reason — 15-word preview + Read more */}
                       <td className="pl-reason-cell">
-                        <div className="pl-reason-text">
-                          {p.reason || '—'}
-                        </div>
+                        <ReasonCell
+                          text={p.reason}
+                          onReadMore={(t) => setModalText(t)}
+                        />
                       </td>
 
                       {/* Status */}
@@ -367,7 +409,6 @@ export default function PermissionList() {
                       </td>
 
                       {/* Approved By */}
-
                       <td style={{ whiteSpace: 'nowrap' }}>
                         <span
                           style={{
@@ -383,20 +424,11 @@ export default function PermissionList() {
                         >
                           {p.approved_position || '—'}
                         </span>
-
                         <br />
-
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            color: '#94a3b8',
-                            fontWeight: 400,
-                          }}
-                        >
+                        <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 400 }}>
                           {/* {p.approved_by || '—'} */}
                         </span>
                       </td>
-
                     </tr>
                   );
                 })

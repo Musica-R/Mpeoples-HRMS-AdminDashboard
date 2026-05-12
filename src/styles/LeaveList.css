@@ -354,7 +354,7 @@
 
 .ll-table td {
   padding: 16px 16px;
-  vertical-align: top;        /* top-align so reason text lines up nicely */
+  vertical-align: top;
   color: #334155;
   border-bottom: 1px solid #f1f5f9;
 }
@@ -373,7 +373,6 @@
 
 /* ======================== CELL STYLES ======================== */
 
-/* # index */
 .ll-idx {
   color: #b0bec5;
   font-size: 12px;
@@ -382,7 +381,6 @@
   width: 30px;
 }
 
-/* Leave ID badge */
 .ll-id-badge {
   display: inline-flex;
   align-items: center;
@@ -397,7 +395,6 @@
   letter-spacing: 0.2px;
 }
 
-/* Employee */
 .ll-emp-info {
   display: flex;
   flex-direction: column;
@@ -423,7 +420,6 @@
   width: fit-content;
 }
 
-/* Date */
 .ll-date {
   font-size: 13px;
   color: #475569;
@@ -436,7 +432,6 @@
   font-weight: 400;
 }
 
-/* Leave type chip */
 .ll-type {
   white-space: nowrap;
 }
@@ -456,7 +451,7 @@
 .ll-type-chip.earned  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 .ll-type-chip.default { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
 
-/* ======================== REASON — FULL CONTENT ======================== */
+/* ======================== REASON CELL ======================== */
 .ll-reason-cell {
   min-width: 200px;
   max-width: 280px;
@@ -466,9 +461,108 @@
   font-size: 13px;
   color: #475569;
   line-height: 1.6;
-  white-space: normal;       /* wrap naturally */
+  white-space: normal;
   word-break: break-word;
-  /* NO line-clamp, NO overflow: hidden, NO text-overflow */
+}
+
+/* ── Read more button ── */
+.ll-read-more-btn {
+  display: inline;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d9488;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.ll-read-more-btn:hover {
+  color: #0f766e;
+}
+
+/* ======================== REASON MODAL ======================== */
+.ll-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: ll-fade-in 0.18s ease;
+}
+
+@keyframes ll-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ll-modal-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  animation: ll-slide-up 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ll-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.ll-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e8f4fd 100%);
+}
+
+.ll-modal-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f766e;
+  letter-spacing: -0.2px;
+}
+
+.ll-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ll-modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.ll-modal-body {
+  padding: 22px;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* ======================== STATUS BADGE ======================== */
@@ -660,6 +754,7 @@
   .ll-card { border-radius: 14px; }
   .ll-card-head { padding: 14px 16px; }
   .ll-card-body { padding: 14px 16px; }
+  .ll-modal-box { max-width: 100%; border-radius: 14px; }
 }
 
 /* ======================== 420px ======================== */
@@ -685,4 +780,5 @@
   .ll-card-action-btn { font-size: 11px; padding: 7px; }
   .ll-error { flex-direction: column; align-items: flex-start; gap: 10px; }
   .ll-retry { margin-left: 0; }
+  .ll-modal-body { padding: 16px; font-size: 13px; }
 }

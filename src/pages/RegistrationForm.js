@@ -31,6 +31,8 @@ const RegistrationForm = () => {
     salary: '',
   });
 
+
+  
   const [companies, setCompanies] = useState([]);
   const [branches, setBranches] = useState([]);
   const [roles, setRoles] = useState([]);

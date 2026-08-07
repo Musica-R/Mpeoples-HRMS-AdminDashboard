@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/DashboardHome.css';
 import { useNavigate } from 'react-router-dom';
 
- const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const DashboardHome = () => {
 
@@ -34,7 +34,6 @@ const DashboardHome = () => {
 
         const loadAdminData = () => {
             try {
-                // Check various common local storage keys for dynamic login data
                 const possibleKeys = ['user', 'adminData', 'admin', 'userData', 'authUser'];
                 let foundData = null;
 
@@ -44,7 +43,6 @@ const DashboardHome = () => {
                         try {
                             const parsed = JSON.parse(stored);
                             if (parsed && typeof parsed === 'object') {
-                                // Extract the nested user data if it's wrapped in a token/user object structure
                                 if (parsed.user) {
                                     foundData = parsed.user;
                                 } else {
@@ -56,7 +54,6 @@ const DashboardHome = () => {
                     }
                 }
 
-                // Sets the actual currently logged-in user dynamically!
                 setAdminData(foundData);
             } catch (error) {
                 console.error("Error loading admin data", error);
@@ -77,14 +74,6 @@ const DashboardHome = () => {
         return name.substring(0, 2).toUpperCase();
     };
 
-    // const formatTime = (timeString) => {
-    //     if (!timeString) return 'N/A';
-    //     const [hour, minute] = timeString.split(':');
-    //     const h = parseInt(hour, 10);
-    //     const ampm = h >= 12 ? 'PM' : 'AM';
-    //     return `${h % 12 || 12}:${minute} ${ampm}`;
-    // };
-
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
@@ -103,6 +92,14 @@ const DashboardHome = () => {
     return (
         <div className="dashboard-home">
             <div className="welcome-banner glass-panel fade-in-up">
+
+                <button className="settings-icon-corner" onClick={() => navigate("/admin/settings")} title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+
                 <div className="welcome-content">
                     <div className="welcome-text">
                         <span className="date-badge">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
@@ -129,14 +126,6 @@ const DashboardHome = () => {
                                 <div className="profile-role">{adminData.position || adminData.role || 'Staff Member'}</div>
                                 <div className="profile-meta">
                                     <span className="meta-item"><i className="icon-id"></i> {adminData.empid || 'No ID assigned'}</span>
-                                    {/* {(adminData.start_time || adminData.end_time) && (
-                                        <span className="meta-item">
-                                            <i className="icon-time"></i>
-                                            {adminData.start_time ? formatTime(adminData.start_time) : ''}
-                                            {adminData.start_time && adminData.end_time ? ' - ' : ''}
-                                            {adminData.end_time ? formatTime(adminData.end_time) : ''}
-                                        </span>
-                                    )} */}
                                 </div>
                             </div>
                         </div>

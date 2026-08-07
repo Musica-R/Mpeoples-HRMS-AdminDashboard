@@ -408,6 +408,30 @@ body {
   animation: fadeInUp .6s ease forwards;
 }
 
+.welcome-banner {
+    position: relative;
+}
+.settings-icon-corner {
+    position: absolute;
+    top: 76px;
+    right: 36px;
+    /* background: rgba(154, 154, 154, 0.15); */
+    border: none;
+    color: steelblue;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    /* transition: background 0.2s, transform 0.2s; */
+}
+.settings-icon-corner:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(20deg);
+}
+
 /* Responsive */
 
 /* ======================== 1024px (Tablet / Small Laptop) ======================== */

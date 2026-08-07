@@ -19,6 +19,10 @@ import Montlyreport from './pages/Montlyreport';
 import CreateProject from './pages/Createproject';
 import TaskStatusPanel from './pages/TaskStatusPanel';
 import Payroll from './pages/Payroll';
+import Settings from './pages/Settings';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import AccountDeletion from './pages/AccountDeletion';
 
 function App() {
 
@@ -39,6 +43,10 @@ function App() {
                 (<Navigate to="/admin" replace />) : (<Login />)
               ) : (<Login />)} />
 
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/account-deletion" element={<AccountDeletion />} />
+
           <Route path="/admin" element={<ProtectedRoute> <AdminLayout /> </ProtectedRoute>}>
             <Route index element={<DashboardHome />} />
             <Route path="add-employee" element={<RegistrationForm />} />
@@ -55,6 +63,7 @@ function App() {
             <Route path="add-company" element={<CompanyDetails />} />
             <Route path="raise-ticket" element={<RaiseTicket />} />
             <Route path="monthly-report" element={<Montlyreport />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
